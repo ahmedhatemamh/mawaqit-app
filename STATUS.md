@@ -2,6 +2,13 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 16:06 (Cairo) - Phase 3 (spec) draft written, awaiting Ahmed's answers
+
+- Ahmed clarified the "official result" sentence: the printed yearly prayer timetable distributed to the public. The app must replace it so he never needs the paper. Result: a "Year timetable" screen (every day: Gregorian date, Hijri date, six times, offline) is part of the spec. The earlier "official data record" interpretation stays as the internal correction source.
+- docs/spec.md written (screens: Today, Year timetable, Reminders, Widgets W1-W4, City/location; data promises with what is behind each; acceptance checks; out of scope; open questions Q1-Q7). No code.
+- Honest limit recorded: Hijri month starts are announced about a day ahead, so Hijri dates for later months can only be estimates (marked) unless Ahmed chooses otherwise (Q2).
+- Awaiting Ahmed's answers to Q1-Q7 and his approval of the spec before phase 4.
+
 ## 2026-11-23 16:01 (Cairo) - Ahmed's answers on N1-N8 recorded in docs/plan.md
 
 - Approved: N1, N3, N5, N6, N8. Changed: N2 (measure formula vs ESA for a full year, correct via the 1/11/21 checks), N4 (Hijri can change only on Hijri days 29, 30, 1, 2, 3), N7 (check whether the ESA vs Dar al-Ifta difference is permanent and in which prayers).
