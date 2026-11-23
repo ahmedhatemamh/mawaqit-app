@@ -30,6 +30,8 @@ lo, hi = 0.0, 1.0
 ok0, _ = feasible(0.0)
 print("feasible with exact rounding intervals:", ok0)
 if not ok0:
+    if not feasible(hi)[0]:
+        raise SystemExit("input error: infeasible even with a widening of %.1f min" % hi)
     for _ in range(14):
         mid = (lo + hi) / 2
         if feasible(mid)[0]: hi = mid

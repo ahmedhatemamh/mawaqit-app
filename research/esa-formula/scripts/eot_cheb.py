@@ -24,6 +24,8 @@ def feas(ref, delta):
     return False
 def mindelta(ref):
     lo, hi = 0.0, 2.0
+    if not feas(ref, hi):
+        raise SystemExit("input error: infeasible even with a deviation of %.1f min" % hi)
     for _ in range(16):
         mid = (lo + hi) / 2
         if feas(ref, mid): hi = mid

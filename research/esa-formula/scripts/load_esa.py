@@ -13,4 +13,6 @@ def load(folder):
             d = dt.date.fromisoformat(r[1])
             v = [mins(x) for x in r[3:9]]
             data.setdefault(norm(r[0]), {})[d] = v
+    if not data:
+        raise SystemExit("input error: no ESA day files (2026-*.json) found in %s" % folder)
     return data
