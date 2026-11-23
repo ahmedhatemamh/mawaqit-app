@@ -2,6 +2,20 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 15:35 (Cairo) - Ahmed's decisions on the plan review
+
+Decisions (Ahmed's words, summarized):
+- D1 source: compute on the phone. On the 1st, 11th and 21st of every Gregorian month the app goes online, compares with ESA / Dar al-Ifta, and corrects itself if different (internet 3 times a month for prayer times).
+- D2 cities: both (ESA city list with coordinates + optional GPS).
+- D3 tolerance vs ESA: zero minutes.
+- D4 Hijri: source is Dar al-Ifta only. NO manual +/-1 day adjustment, ever. Check Dar al-Ifta only on Hijri days 27, 28, 29, 30, 1, 2, 3; no re-check after that.
+- D5 minimum Android: 8 (API 26).
+- D6 scraper role: Ahmed asks whether D1 already answers it (to be settled in the final plan).
+- Widgets: several widget designs, all prayers + next prayer, more than one available; Ahmed picks or edits later.
+- Play Console: Ahmed already has a paid developer account with an app published. The $25 step is removed.
+
+Next: final plan to be written on Opus (Ahmed's request). Current session model is Sonnet, so planning waits for Ahmed to switch the model. No code started.
+
 ## 2026-11-23 15:23 (Cairo) - Plan review (Ahmed asked for a full critique and a full roadmap)
 
 Phase 3 is NOT started. Ahmed asked for a critique of phases 1-3 and a full plan for all remaining phases, then he decides.
