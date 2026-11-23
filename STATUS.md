@@ -2,6 +2,20 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 15:15 (Cairo) - Phase 2 (read-only): Hijri API unreachable, ESA postback works
+
+Approved by Ahmed: all phase-1 recommendations; phase 2 started on his explicit order. Network: di107.dar-alifta.org added to the personal "Mawaqit" environment allowlist (approved by Ahmed). No code changed; downloads kept in the scratchpad.
+
+Findings:
+- Dar al-Ifta Hijri API (http://di107.dar-alifta.org/api/HijriDate?langID=1): NOT reachable from the cloud session. HTTP: "Could not resolve host" (no DNS record from here). HTTPS: connection reset by peer. Not a 403, no workaround attempted. Response format still unknown. Possible causes: the host is internal/stale or blocks cloud IPs. Needs another way to check (Ahmed's own browser, or ask Dar al-Ifta).
+- ESA postback works (HTTP 200): POST to /praytimes.aspx with __VIEWSTATE, __VIEWSTATEGENERATOR, __EVENTVALIDATION taken from the page, __EVENTTARGET=ctl00$placeholder1$Calendar1 and __EVENTARGUMENT=<day code>. The reply is the full table of 78 cities for that day (tested 2026-11-01, code 9801; table identical in layout to today's). Day code appears to be days since 2000-01-01 (9801 = 1 Nov 2026); month arrows use V-codes (V9770 previous, V9831 next month).
+- So one month from ESA = about 30 postbacks (one per day), all cities each. Hijri date comes with every row ("21 جماد الأول 1448"), so ESA alone can give Hijri dates.
+- Cross-check: Cairo on 2026-11-01 is identical in ESA (4:41, 6:9, 11:38, 2:45, 5:8, 6:27) and Dar al-Ifta (04:41, 06:09, 11:38, 02:45, 05:08, 06:27), with the Ifta dhuhr AM/PM typo again. They look like the same underlying data for Cairo; other cities not compared yet.
+
+Recommendation for phase 3 (needs Ahmed's approval): ESA postback as the main source (all 78 cities, Hijri included); Dar al-Ifta /ar/prayer (Cairo, no query string) only as a cross-check; Hijri API dropped until we can reach it. Scrape politely (sequential, about 1 request/second, one run per month plus a daily refresh).
+
+Awaiting Ahmed's approval before phase 3 (parser + validator + JSON schema).
+
 ## 2026-11-23 15:06 (Cairo) - Phase 1 (read-only): source pages inspected, all three open (HTTP 200)
 
 Result: the 403 from the previous entry is gone. All three pages returned HTTP 200 via curl. HTML saved in the session scratchpad only (not in the repo). No code changed.
