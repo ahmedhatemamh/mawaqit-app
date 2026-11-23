@@ -2,6 +2,110 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 20:16 (Cairo) - PR رقم 1 في mawaqit-data: مراجعة كودرابت خلصت من غير ملاحظات
+
+- مراجعة كودرابت على commit 4f83697 خلصت: "No actionable comments were generated in the recent review"، ودرجة الخطر Minimal، وكتب إن مخاوف التقويم المستحيل ماعادتش منطبقة.
+- thread واحد (التباعد بين الشهور، Major، على scripts/hijri_lib.py) فضل مفتوح ومعلّم outdated من غير "Addressed". قفلته بإيدي حسب قاعدة أحمد (كودرابت خلّص بدون ملاحظات ونسي يقفله). الـthreads التانيين كودرابت قفلهم بنفسه.
+- مادمجتش: الدمج بأمر أحمد صريح فقط. الـAction لسه ماتجربش على سيرفرات GitHub (هيتجرب بعد الدمج بـworkflow_dispatch).
+
+## 2026-11-23 20:14 (Cairo) - نتيجة مراجعة كودرابت على PR رقم 1 في mawaqit-app (فحص التذكير المجدول)
+
+- كودرابت راجع commit db1956e (الإصلاحات) تلقائيًا الساعة 19:32 بتوقيت القاهرة: "No actionable comments were generated in the recent review"، ودرجة خطر الدمج Minimal، وكل الـ8 threads السابقة اتقفلت من كودرابت نفسه بـ"✅ Addressed in commit db1956e".
+- فمطلبتش مراجعة جديدة (ماكنش في داعي، وكانت هتصرف من الحد: 5 مراجعات في الساعة، وفاضل 2 بعد المراجعة دي). مفيش thread مفتوح ومفيش حاجة بقفلها بإيدي.
+- الـPR جاهز للدمج بس مادمجتوش: الدمج بأمر أحمد صريح فقط.
+- PR رقم 1 في mawaqit-data: كودرابت علّم ملاحظة الـworkflow "Addressed in commit 4f83697"، ومراجعته على الـcommit ده لسه بتتعمل. ملاحظة التباعد بين الشهور لسه مفتوحة ومعلّمة outdated (بيقفلها كودرابت بعد مراجعته).
+
+## 2026-11-23 20:11 (Cairo) - المرحلة 5 (الجزء الثاني): أرشيف بيانات دار الإفتاء الرسمية لبداية الشهور الهجرية، وإصلاح ملاحظات PR رقم 1 في mawaqit-data
+
+أحمد قال "كمّل بالمصادر المصرية الإضافية للهجري".
+
+اكتشاف مهم (على موقع دار الإفتاء نفسه، الهوست المسموح، ومفيش شروط استخدام ظاهرة، والروابط من غير علامة استفهام):
+- دار الإفتاء بتنشر "بيان دار الإفتاء المصرية حول رؤية هلال شهر X" لكل شهر هجري. الأرشيف فيه 135 بيان (من 1437 لـ1448) في الـsitemap الرسمي.
+- سحبت الـ135 بيان (طلب كل 3 إلى 5 ثواني، من غير أي حجب) في scratchpad، وكتبت parser بيقرا من الجملة الرسمية: اسم اليوم ورقم اليوم (بالكلام) والشهر الميلادي، والسنة بتتحدد من السنة الهجرية. النتيجة: 135 بيان اتحللوا (القوالب القديمة فيها اختلافات: "لسنة"، "عيد الفطر"، يونيه/يوليه، أرقام عربية، اقتباس من بيان السعودية).
+- النتيجة: 133 شهر هجري متصل من 1437-06 لـ1448-06 (حوالي 11 سنة)، من غير أي شهر ناقص. كل شهر بعد اللي قبله بـ29 أو 30 يوم (62 شهر 29 يوم، 70 شهر 30 يوم)، ومفيش تناقض. بداية 1448-06 = 2026-11-11 مطابقة لرأس صفحة /ar/prayer. بدايات رمضان مطابقة للمعروف: 2023-03-23، 2024-03-11، 2025-03-01، 2026-02-19.
+- حالة تصحيح رسمي: صفر 1438 ليه بيانين: الأول (id 4349) 31 أكتوبر 2016، والتاني (id 4350) صحّحه لـ1 نوفمبر 2016. الأخير هو الصحيح (يتسق مع تسلسل الشهور). يعني لازم نتعامل مع تصحيحات لاحقة: البيان الأحدث بيغلب.
+- مقارنة مع جدول المساحة (العمود الهجري، مقارنة داخلية): كل 2026 بتتطابق ماعدا رمضان 1447: المساحة 18 فبراير، ودار الإفتاء 19 فبراير (365 يوم اتفحصوا، 52 يوم مختلفين كلهم في رمضان). يعني العمود الهجري عند المساحة تقدير مش بيان رسمي، ودار الإفتاء هي المصدر الصح. المساحة بتعرض كمان بداية رجب 1448 = 2026-12-10 (توقع، لسه ماتأكدش).
+- مصادر مصرية تانية لقيتها (بالبحث، ماقريتش شروطها لسه): المعهد القومي للبحوث الفلكية nriag.sci.eg (بينشر توقعات فلكية لغرة كل شهر وتقويم سنوي PDF مثل Ar-1445.pdf)، ومواقع إخبارية مصرية بتنقل بيانات الإفتاء والمعهد (صدى البلد، أخبار اليوم، الدستور، ماسبيرو، القاهرة 24). لازم نقرا robots.txt وشروط كل موقع قبل أي سحب، ونضيف المواقع للشبكة المسموحة بموافقة أحمد.
+
+إصلاح ملاحظات كودرابت على PR رقم 1 في mawaqit-data (Major، الاتنين صح على كودي):
+- تحقق المسافة بين الشهور لما في شهور فايتة (كان بيتخطى التحقق): دلوقتي لأي عدد شهور n الفرق لازم يكون بين 29n و30n يوم، من الشهر المسجل الأقرب من الجهتين؛ والطول بيتسجل بس للشهور المتجاورة. اختبار الشهور الفايتة القديم كان بيقبل تاريخ مستحيل (فبراير 1) واتعدل (فبراير 7). 32 اختبار نجحوا.
+- نشر Pages: الـAction بيطلب build صراحة (pages: write) وبعدين بيتحقق إن الملف المنشور فعلًا مطابق للملف اللي اتعمله commit (فشل = issue). ماقدرتش أجرب ده هنا، هيتجرب بعد الدمج بـworkflow_dispatch.
+
+PR رقم 1 في mawaqit-app: مفيش ملاحظات جديدة، في انتظار مراجعة كودرابت الجديدة (مجدولة 20:14).
+
+## 2026-11-23 19:48 (Cairo) - المرحلة 5 (الجزء الأول): سكريبت التاريخ الهجري من دار الإفتاء، PR رقم 1 في mawaqit-data
+
+بدأت المرحلة 5 بأمر أحمد. أضفت مستودع mawaqit-data للجلسة بصلاحية الدفع (بموافقة أحمد)، وشغلت على فرع feat/hijri-pipeline.
+
+اللي اتعمل (الجزء الأول: دار الإفتاء بس؛ المصادر المصرية الإضافية بعد قراءة شروطها، وجزء المساحة "نسحب ونجهز من غير نشر" لسه ما بدأش):
+- scripts/hijri_lib.py وscripts/hijri_update.py: قراءة التاريخ الهجري من صفحة /ar/prayer، تتبّع بداية كل شهر وطوله، والمتابعة في آخر 3 أيام وأول 3 أيام من الشهر الهجري بالعدّ (28 و29 و30 و1 و2 و3) فقط؛ باقي الأيام ما بيدخلش الموقع. أي تناقض بيوقف من غير نشر.
+- .github/workflows/hijri.yml: يومي، يشغل الاختبارات، وينشر docs/hijri.json لو اتغير، ولو فشل يفتح issue "تعذر تحديث التاريخ الهجري".
+- docs/hijri.json: أول تسجيل حقيقي: 13 جمادى الآخرة 1448 = 23 نوفمبر 2026، بداية الشهر 2026-11-11 (نفس اللي المساحة بتعرضه).
+- الاختبار: 29 اختبار نجحوا (عادي، ناقص، غلط، قيم حدّية، تحوّل شهر وسنة، تناقض، فشل جلب). التشغيل الحقيقي الأول فشل بأمان لأن الصفحة بتستخدم &ndash;، اتصلح وأضيف اختبار. لسه ماتجربش على سيرفرات GitHub Actions (ممكن دار الإفتاء تحجبها): هيتجرب بـworkflow_dispatch بعد الدمج بأمر أحمد.
+- PR رقم 1 في mawaqit-data اتفتح واشتركت في نشاطه. مراجعة CodeRabbit بتتعمل تلقائيًا.
+
+رد على سؤال أحمد "انت حليت وقفلت الملاحظات ليه": ماقفلتش ولا كتبت "Fixed" على PR رقم 1 في mawaqit-app. كودرابت نفسه قفل الـ8 threads تلقائيًا وكتب "Addressed in commit db1956e" بعد ما اكتشف الإصلاحات (19:29-19:30 بتوقيت القاهرة). قاعدة أحمد الجديدة اتسجلت في CLAUDE.md: أنا بصلّح ومابقفلش، إلا لو كودرابت خلّص مراجعته الجديدة من غير ملاحظات ونسي يقفل thread. وقاعدة "اشترك في كل PR" اتسجلت كمان.
+
+في انتظار أحمد: مراجعة CodeRabbit الجديدة لـPR رقم 1 في mawaqit-app (مجدولة 20:14)، وتحديد خطوة المصادر المصرية الإضافية للهجري.
+
+## 2026-11-23 19:41 (Cairo) - ردود أحمد: "غير مؤكد" بالشهر، تقدير أول الشهر بمعادلة، متابعة PR رقم 1
+
+قرارات أحمد:
+- "غير مؤكد" بيتحدد بالشهر مش باليوم: لو أول يوم في الشهر الهجري غير دقيق فباقي أيام الشهر غير دقيقة، ولو أول يوم اتأكد فباقي الشهر مؤكد. (docs/spec.md البند 8.5 اتعدل.)
+- تقدير أول الشهر الهجري المستقبلي: أحمد شايف إن في معادلة تقريبية لحساب أول يوم في الشهر العربي. موافق على الفكرة (عمر الهلال وإمكانية رؤيته وقت الغروب في القاهرة، ونجربها على تواريخ دار الإفتاء المسجلة لسنين فاتت عشان نعرف دقتها). البند 8.9 في المواصفات.
+- جزء المساحة: نسحب ونجهز بياناتها من غير نشر (مؤكد).
+- اشتركت في نشاط PR رقم 1 (تعليقات CodeRabbit والـCI بتوصل تلقائيًا).
+- مراجعة CodeRabbit جديدة بعد 20:13 بتوقيت القاهرة (موافق عليها): اتجدولت رسالة تذكير لنفسي الساعة 20:14.
+- مرحلة 5 لسه ماتبدأتش: في انتظار أمر "ابدأ المرحلة 5" صريح من أحمد.
+
+## 2026-11-23 19:29 (Cairo) - مراجعة CodeRabbit على PR رقم 1، وقرارات أحمد على الهجري والمواصفات
+
+قرارات أحمد (ردود جديدة):
+- المواصفات اتوافق عليها. زيادات: بحث بتاريخ هجري أو ميلادي أو عام مع إظهار اسم اليوم (السبت، الأحد...)؛ الويدجات بطريقتين تحديث: "متغير" (القايمة المتحركة) و"ثابت" (الست مواقيت بترتيب ثابت).
+- رسالة الهيئة اتبعتت (أحمد بعتها بنفسه).
+- الهجري: "غير مؤكد" للمستقبل (بمعنى أول يوم في الشهر الهجري غير دقيق)، وللماضي لو في خلاف على بداية الشهر بين المصادر. المصادر أكتر من مصدر ومصرية: الأدق مقالات وإعلانات دار الإفتاء (لو متاحة)، ثم الوسائل الإخبارية الموثوقة ومصادر مصرية تانية. أم القرى مش مصدر (مش مصري وممكن يختلف). المتابعة في آخر 3 أيام وأول 3 أيام من الشهر الهجري بس (28 و29 و30 و1 و2 و3)، والباقي مؤكد بالعدّ. لو ماعرفناش نوصل للتاريخ نبعت لأحمد لحل.
+- docs/spec.md وdocs/plan.md اتحدثوا بالقرارات دي. جديد في المواصفات (9.1): نحتاج طريقة مستقلة لتقدير أول الشهر الهجري المستقبلي (مثلًا عمر الهلال وقت الغروب في القاهرة، ومقارنتها بتواريخ دار الإفتاء المسجلة لسنين فاتت)، بانتظار موافقة أحمد.
+
+مراجعة CodeRabbit على PR رقم 1 (research/esa-formula):
+- CodeRabbit رد تلقائيًا (19:13 بتوقيت القاهرة): 8 ملاحظات، كلها "Minor"، والـPR نفسه Merge Risk منخفض.
+- راجعت كل ملاحظة على الكود الحالي: الـ8 كلها صحيحة. اتصلحت في دفعة واحدة بأقل تغيير (commit db1956e على الفرع): ترتيب نتيجة جزئية في arcmin.py، نصف يوم زيادة في cmp_cairo.py، خط الطول على حد الفترة في dhuhr_feas.py، قايمة فاضية في dhuhr_miss.py، rtol=0 في diffcons.py وeot_cheb.py، اسم ملف ناتج بيحمل DMODE في fit_all2.py، مدينة غير موجودة في try_shift.py.
+- الاختبار: كل السكريبتات اتشغلت على بيانات 2026 الحقيقية والنتايج مطابقة (dhuhr_miss: 103 فرق، arcmin: نفس الأحسن، fit_all2: 99.250%)، وحالة المجلد الفاضي في try_shift.py بتوقف بخطأ واضح، ومثال CodeRabbit في dhuhr_feas.py اتجرب (يرجع 721 زي المتوقع). نتيجة وحيدة اتغيرت: eot_cheb.py بعد rtol=0 بقت 0.56 ثانية بدل 0.51 (التسامح القديم كان بيقلل الرقم).
+- ماقفلتش threads ولا كتبت "Fixed" (القاعدة: لحد ما مراجعة CodeRabbit الجديدة تخلص). حد CodeRabbit: 5 مراجعات في الساعة (3 باقية بعد المراجعة الأولى). مراجعة جديدة: بـ"@coderabbitai review" عادي بعد ساعة من الأولى (بعد 20:13 بتوقيت القاهرة) وبموافقة أحمد.
+- الدرس اتسجل في docs/lessons-learned.md.
+
+## 2026-11-23 19:04 (Cairo) - ردود أحمد على نقاط المواصفات، وترجمة STATUS، وPR لفرع البحث
+
+قرارات أحمد:
+- الويدجت: الصلاة السابقة + 6 مواعيد تالية (الخيار ب). التنبيهات: 3 قبل + 3 بعد حد أقصى. "صليت": تنبيه القبل بيسأل "هل صليت؟" والبعد "قم للصلاة" وفيه زر "صليت" بيلغي القبل الجاي (مؤكد).
+- كل السنين: المعادلة هي هي، والصيفي أو الشتوي بيغيّر ساعة بس. لسنة قاعدتها مش مؤكدة نطبق أقرب قاعدة معروفة ونكتب "غير مؤكد".
+- الهجري: نستعلم من أكتر من مصدر من الإنترنت ونسجله ونكتب جنبه "غير مؤكد".
+- مرحلة 5: نقدر نسحب ونجهز من غير ما ننشر بيانات المساحة، وبيانات دار الإفتاء مفيهاش منع فممكن نستخدمها لحد ما الهيئة ترد. (سجلت إن كود سحب المساحة ما يتحطش في مستودع عام لحد الرد.)
+- عنوان رسالة الهيئة: "طلب بيان طريقة حساب مواقيت الصلاة وإذن استخدام المواقيت في تطبيق مجاني غير ربحي". اتضاف للرسالة، والنسخة ببيانات أحمد اتبعتت له (مش في المستودع).
+- موافق على ترجمة قيود STATUS القديمة وفتح PR لفرع research/esa-formula.
+
+اللي اتعمل:
+- docs/spec.md: القسم 8 بقى "قرارات اتحسمت"، والقسم 9 "لسه محتاج تأكيد" (معنى "غير مؤكد" في الهجري، ومصادر الهجري الإضافية). docs/plan.md: المرحلة 5 والموقف القانوني اتعدلوا.
+- قيود STATUS القديمة (الإنجليزي) اتترجمت للعربي (أرقام وأسماء تقنية زي ما هي).
+- فتح PR لفرع research/esa-formula (انظر الرد).
+
+## 2026-11-23 18:47 (Cairo) - تعديل رسالة الهيئة والمواصفات بناءً على ملاحظات أحمد
+
+- رسالة الهيئة (docs/esa-letter.md): بقت باسم أحمد حاتم وفيها المعادلة اللي وصلنالها ونسب الفروق (99.25% تطابق، 1281 فرق من 170,808 قيمة، كلها دقيقة واحدة، القاهرة 99.41%، 345 يوم من 365 فيهم فرق في مدينة على الأقل، 95.6% من حالات مدينة×يوم متطابقة تمامًا)، وصياغتها "طابقت معادلتي على المواقيت المنشورة" بدون تفاصيل السحب (قرار أحمد). رقم أحمد وإيميله مش في المستودع (قاعدة: مفيش بيانات شخصية في الـcommits والمستودع عام)؛ النسخة الكاملة اتبعتت لأحمد مباشرة.
+- المواصفات (docs/spec.md) اتعدلت: الويدجات بقايمة متحركة (الصلاة السابقة ثم المواعيد التالية)، التنبيهات (لصلاة أو بعض أو كل، منع، دايم أو فترة أو مرة، 3 قبل + 3 بعد، "صليت" يلغي تنبيه القبل الجاي، تكرار لو لا)، مدينة يدوي أو بصلاحية الموقع، أي يوم ماضي أو مستقبلي، وقت المنع 10/15/20/25 (افتراضي 25)، كل السنين من المعادلة، الهجري الماضي يتسجل من الإنترنت والمستقبل توقع.
+- نقاط محتاجة تأكيد أحمد (القسم 8 من المواصفات): عدد المواعيد في الويدجت، حد التنبيهات، معنى "صليت" والتنبيه القبل، السنين التانية (التوقيت الصيفي التاريخي ودقة المعادلة بعيد عن 2026)، الهجري الماضي (دار الإفتاء بتنشر النهارده بس).
+
+## 2026-11-23 18:16 (Cairo) - قرارات أحمد: نثبّت المعادلة ونسأل الهيئة، حفظ السكريبتات، ترجمة الوثائق
+
+قرارات أحمد: الخيار أ (نقف عند أحسن معادلة، 99.25%) والخيار ج (نسأل الهيئة عن المعادلة الدقيقة)، وحفظ السكريبتات، وإرسال البيانات له، وترجمة الوثائق للعربي.
+
+اللي اتعمل:
+- السكريبتات (كود التحليل فقط، من غير بيانات المساحة ومن غير سكريبت السحب) اتحفظت في فرع research/esa-formula وادفعت (بدون PR، بانتظار أمر أحمد). فيه كمان fitted_cities.json (إحداثيات المدن المستنتجة من تحليلنا) وREADME عربي.
+- بيانات المساحة الخام (365 ملف) اتبعتت لأحمد كملف مضغوط. مش في المستودع.
+- مصادر البيانات: السحب كله من المساحة فقط. دار الإفتاء ماتسحبش منها بيانات بالجملة، بس صفحة /ar/prayer مرة واحدة (القاهرة، نوفمبر 2026). قارنتها بالمساحة: 180 قيمة مطابقة 100% (مع غلطة "م" بدل "ص" في الظهر عند الإفتاء). يعني القاهرة عند الجهتين نفس الأرقام.
+- docs/plan.md وdocs/spec.md وdocs/lessons-learned.md اتترجموا للعربي (الملفات القديمة كانت إنجليزي). جديد: docs/esa-letter.md (مسودة رسالة للهيئة: طريقة الحساب بالتفصيل + إذن غير ربحي محدود)، أحمد يعدلها ويبعتها بنفسه.
+- باقي: قيود STATUS.md القديمة (الإنجليزي) مازالت بالإنجليزي، وفتح PR لفرع البحث (بانتظار أمر أحمد).
+- مرحلة 5 (سحب ونشر بيانات) متوقفة لحد رد الهيئة.
+
 ## 2026-11-23 18:09 (Cairo) - المرحلة 4: محاولة الوصول لصفر، أحسن نتيجة 99.25%
 
 طلب أحمد: "جرب ممكن توصل لصفر" (على Opus).
@@ -75,130 +179,130 @@ Newest entry first. Add new entries at the top using Edit only.
 - أخطاء اتسجلت كدروس في docs/lessons-learned.md: (1) بدأت سحب بالجملة قبل قراءة شروط الاستخدام. (2) كتبت ملفات الخطة والمواصفات بالإنجليزي بدل العربي.
 - في انتظار قرار أحمد: الاتجاه القانوني (طلب إذن من الهيئة أو اتجاه تاني). لا سحب تاني قبل كده.
 
-## 2026-11-23 16:38 (Cairo) - Spec R1-R4 confirmed by Ahmed
+## 2026-11-23 16:38 (Cairo) - أحمد أكد نقاط المواصفات R1 لـR4
 
-- R1: reminder before a prayer = "did you pray?" (yes stops, no repeats every N minutes until the next prayer); reminder after = "get up to pray". N is edited by Ahmed (default 10). No prayer history for now.
-- R2: Ahmed will find an open-source adhan; meanwhile the user can pick any ringtone/song from the phone. No recording with unknown license is shipped.
-- R3: flash blinks with the alert like call/notification flash, no fixed duration, stops when the alert ends or is dismissed; off by default.
-- R4: confirmed.
-- docs/spec.md updated. Awaiting Ahmed's approval of the whole spec before phase 4.
+- R1: التنبيه قبل الصلاة بيسأل "هل صليت؟" (آه يوقف، لا يكرر كل N دقيقة لحد الصلاة التالية)، والتنبيه بعدها بيقول "قم للصلاة". N رقم أحمد يعدله (افتراضي 10). مفيش سجل صلوات حاليًا.
+- R2: أحمد هيدور على أذان مفتوح المصدر، ولحد ما يلاقيه المستخدم يختار أي نغمة أو أغنية من الموبايل. مفيش تسجيل مجهول الترخيص في التطبيق.
+- R3: الفلاش يومض مع التنبيه زي فلاش المكالمات والإشعارات، من غير مدة ثابتة، ويقف لما التنبيه ينتهي أو يتقفل. مقفول افتراضيًا.
+- R4: مؤكدة.
+- docs/spec.md اتحدثت. في انتظار موافقة أحمد على المواصفات كلها قبل المرحلة 4.
 
-## 2026-11-23 16:31 (Cairo) - Ahmed's answers on spec Q1-Q7 recorded in docs/spec.md
+## 2026-11-23 16:31 (Cairo) - إجابات أحمد على أسئلة المواصفات Q1-Q7 اتسجلت في docs/spec.md
 
-- Approved: Q1 (look, editable after testing), Q2 option (a), Q3 no share/print, Q7 name. Q4-Q6 detailed: any-number-of-minutes reminders before/after, per prayer or shared, "did you pray?" follow-up that repeats until the next prayer, phone sound or adhan sound, camera flash alert, prohibited time (sunrise + 25 min) shown under sunrise with its own reminders, any reminder cancellable.
-- New points to confirm: R1 ("did you pray?" meaning and repeat interval), R2 ("انولة" read as adhan, needs a legally usable recording), R3 (flash limits), R4 (prohibited time display).
-- Spec stays a draft until Ahmed confirms R1-R4. No code started.
+- موافق عليه: Q1 (الشكل، قابل للتعديل بعد التجربة)، Q2 الخيار أ، Q3 مفيش مشاركة أو طباعة، Q7 الاسم. تفاصيل Q4-Q6: تنبيهات بأي عدد دقايق قبل وبعد، لصلاة أو مشتركة، متابعة "هل صليت؟" بتكرر لحد الصلاة التالية، صوت الموبايل أو الأذان، فلاش الكاميرا، وقت المنع (الشروق + 25 دقيقة) تحت الشروق وله تنبيهاته، وأي تنبيه ممكن يتلغي.
+- نقاط محتاجة تأكيد: R1 (معنى "هل صليت؟" والتكرار)، R2 (فهمت "انولة" كأذان، ومحتاج تسجيل مسموح قانونيًا)، R3 (حدود الفلاش)، R4 (عرض وقت المنع).
+- المواصفات مسودة لحد ما أحمد يأكد R1-R4. لا كود.
 
-## 2026-11-23 16:06 (Cairo) - Phase 3 (spec) draft written, awaiting Ahmed's answers
+## 2026-11-23 16:06 (Cairo) - مسودة المرحلة 3 (المواصفات) اتكتبت، بانتظار إجابات أحمد
 
-- Ahmed clarified the "official result" sentence: the printed yearly prayer timetable distributed to the public. The app must replace it so he never needs the paper. Result: a "Year timetable" screen (every day: Gregorian date, Hijri date, six times, offline) is part of the spec. The earlier "official data record" interpretation stays as the internal correction source.
-- docs/spec.md written (screens: Today, Year timetable, Reminders, Widgets W1-W4, City/location; data promises with what is behind each; acceptance checks; out of scope; open questions Q1-Q7). No code.
-- Honest limit recorded: Hijri month starts are announced about a day ahead, so Hijri dates for later months can only be estimates (marked) unless Ahmed chooses otherwise (Q2).
-- Awaiting Ahmed's answers to Q1-Q7 and his approval of the spec before phase 4.
+- أحمد وضّح جملة "النتيجة الرسمية": هي النتيجة المطبوعة السنوية اللي بتتوزع على الناس. التطبيق لازم يغني عنها. الناتج: شاشة "نتيجة السنة" (لكل يوم: الميلادي والهجري والمواقيت الست، بدون إنترنت) جزء من المواصفات. وتفسير "السجل الرسمي" فضل كمصدر تصحيح داخلي.
+- docs/spec.md اتكتب (الشاشات: اليوم، نتيجة السنة، التنبيهات، الويدجات W1-W4، المدينة/الموقع؛ وعود البيانات واللي وراها؛ اختبارات القبول؛ خارج النطاق؛ أسئلة Q1-Q7). لا كود.
+- حد صريح اتسجل: بداية الشهر الهجري بتتعلن قبلها بيوم تقريبًا، فالتواريخ الهجرية للشهور الجاية تقدير (بعلامة) إلا لو أحمد اختار غير كده (Q2).
+- في انتظار إجابات أحمد على Q1-Q7 وموافقته على المواصفات قبل المرحلة 4.
 
-## 2026-11-23 16:01 (Cairo) - Ahmed's answers on N1-N8 recorded in docs/plan.md
+## 2026-11-23 16:01 (Cairo) - إجابات أحمد على N1-N8 اتسجلت في docs/plan.md
 
-- Approved: N1, N3, N5, N6, N8. Changed: N2 (measure formula vs ESA for a full year, correct via the 1/11/21 checks), N4 (Hijri can change only on Hijri days 29, 30, 1, 2, 3), N7 (check whether the ESA vs Dar al-Ifta difference is permanent and in which prayers).
-- Product principles: simple, light, Islamic identity, no user setup; user only chooses widgets and sets reminders (before upcoming prayers or one prayer, fixed or variable offsets, several per prayer).
-- Open: Ahmed's last sentence about an "official result" record with prayer times and an updated Hijri date is interpreted as one official dataset (times + Hijri); awaiting his confirmation.
-- Model note: this edit was made on Sonnet; planning itself was done on Opus earlier. No code started.
+- موافق: N1 وN3 وN5 وN6 وN8. اتغير: N2 (نقيس المعادلة مقابل المساحة سنة كاملة ونصحح بمراجعات 1/11/21)، N4 (الهجري ممكن يتغير في أيام 29 و30 و1 و2 و3 بس)، N7 (نشوف هل فرق المساحة عن الإفتاء دايم وفي أنهي صلوات).
+- مبادئ المنتج: بسيط وخفيف وهوية إسلامية وبدون إعدادات؛ المستخدم بيختار الويدجات ويضبط التنبيهات بس (قبل الصلوات الجاية أو لصلاة واحدة، بفرق ثابت أو متغير، وأكتر من تنبيه للصلاة).
+- مفتوح: جملة أحمد الأخيرة عن "النتيجة الرسمية" فسرتها كملف رسمي واحد (مواقيت + هجري)؛ بانتظار تأكيده.
+- ملحوظة الموديل: التعديل ده اتعمل على Sonnet، والتخطيط نفسه اتعمل على Opus قبل كده. لا كود.
 
-## 2026-11-23 15:40 (Cairo) - Final plan written (Opus), awaiting Ahmed's decision
+## 2026-11-23 15:40 (Cairo) - الخطة النهائية اتكتبت (Opus)، بانتظار قرار أحمد
 
-- Full plan in docs/plan.md: fixed decisions D1-D5, new decisions N1-N8 (recommendations marked), phases 3-13.
-- New evidence: the header of https://www.dar-alifta.org/ar/prayer shows the official Hijri date ("13 جُمادى الآخرة 1448 هـ"), same as the di107 API Ahmed opened. It is HTTPS, reachable from the cloud, and the URL has no query string (allowed by robots.txt). This is the recommended Hijri source (N4).
-- No code started. Awaiting Ahmed's answers on N1-N8 and approval to start phase 3 (spec).
+- الخطة الكاملة في docs/plan.md: القرارات الثابتة D1-D5، القرارات الجديدة N1-N8 (التوصيات معلّمة)، المراحل 3-13.
+- دليل جديد: أعلى صفحة https://www.dar-alifta.org/ar/prayer بيظهر التاريخ الهجري الرسمي ("13 جُمادى الآخرة 1448 هـ")، وهو نفس اللي أحمد شافه في API الـdi107. الصفحة HTTPS وبتتفتح من السحابة وروابطها من غير علامة استفهام (مسموحة بـrobots.txt). ده المصدر الهجري الموصى بيه (N4).
+- لا كود. في انتظار إجابات أحمد على N1-N8 وموافقته على بدء المرحلة 3 (المواصفات).
 
-## 2026-11-23 15:35 (Cairo) - Ahmed's decisions on the plan review
+## 2026-11-23 15:35 (Cairo) - قرارات أحمد بعد مراجعة الخطة
 
-Decisions (Ahmed's words, summarized):
-- D1 source: compute on the phone. On the 1st, 11th and 21st of every Gregorian month the app goes online, compares with ESA / Dar al-Ifta, and corrects itself if different (internet 3 times a month for prayer times).
-- D2 cities: both (ESA city list with coordinates + optional GPS).
-- D3 tolerance vs ESA: zero minutes.
-- D4 Hijri: source is Dar al-Ifta only. NO manual +/-1 day adjustment, ever. Check Dar al-Ifta only on Hijri days 27, 28, 29, 30, 1, 2, 3; no re-check after that.
-- D5 minimum Android: 8 (API 26).
-- D6 scraper role: Ahmed asks whether D1 already answers it (to be settled in the final plan).
-- Widgets: several widget designs, all prayers + next prayer, more than one available; Ahmed picks or edits later.
-- Play Console: Ahmed already has a paid developer account with an app published. The $25 step is removed.
+القرارات (بكلام أحمد، ملخصة):
+- D1 المصدر: حساب على الموبايل. في أيام 1 و11 و21 من كل شهر ميلادي التطبيق يدخل الإنترنت ويقارن بالمساحة ودار الإفتاء ويصحح نفسه لو في فرق (إنترنت 3 مرات في الشهر للمواقيت).
+- D2 المدن: الاتنين (قايمة مدن المساحة بإحداثياتها + GPS اختياري).
+- D3 الفرق المسموح عن المساحة: صفر دقيقة.
+- D4 الهجري: المصدر دار الإفتاء فقط. مفيش تعديل يدوي ±1 يوم نهائيًا. المراجعة في أيام 27 و28 و29 و30 و1 و2 و3 من الشهر الهجري بس، ومفيش مراجعة بعدها. (اتعدلت بعد كده لأيام 29 و30 و1 و2 و3.)
+- D5 أقل إصدار أندرويد: 8 (API 26).
+- D6 دور السكريبت: أحمد سأل هل D1 جاوبت عليه (يتحسم في الخطة النهائية).
+- الويدجات: أكتر من تصميم، كل الصلوات + الصلاة الجاية، أكتر من واحد متاح؛ أحمد يختار أو يعدل بعدين.
+- Play Console: أحمد عنده حساب مطور مدفوع ومنشور عليه تطبيق. خطوة الـ25 دولار اتشالت.
 
-Next: final plan to be written on Opus (Ahmed's request). Current session model is Sonnet, so planning waits for Ahmed to switch the model. No code started.
+الخطوة الجاية: الخطة النهائية تتكتب على Opus (طلب أحمد). موديل الجلسة وقتها كان Sonnet فالتخطيط استنى تحويل الموديل. لا كود.
 
-## 2026-11-23 15:23 (Cairo) - Plan review (Ahmed asked for a full critique and a full roadmap)
+## 2026-11-23 15:23 (Cairo) - مراجعة الخطة (أحمد طلب نقد كامل وخريطة كاملة)
 
-Phase 3 is NOT started. Ahmed asked for a critique of phases 1-3 and a full plan for all remaining phases, then he decides.
+المرحلة 3 ماتبدأتش. أحمد طلب نقد للمراحل 1-3 وخطة كاملة لكل المراحل الباقية، وبعدها هو اللي يقرر.
 
-New evidence gathered for the review (read-only, scratchpad only):
-- Calculation test: a standard astronomical formula with the Egyptian General Authority of Survey method (fajr 19.5 deg, isha 17.5 deg, Shafi asr) and rough city coordinates matched ESA within 1 minute for Cairo (2026-11-01, 2026-11-23) and Alexandria (2026-11-23). So prayer times can likely be computed on the phone instead of scraped.
-- City lists: ESA table 78 cities, ESA dropdown 83 (5 extra not in the all-cities table: ابوتشت, ديربنجم, سمالوط, منوف + "كل المدن"). Dar al-Ifta 78; differs from ESA by spelling (سفاجه/سفاجا), ESA has مدينة 15 مايو, Ifta has an entry named "45792" (data error in the source).
-- ESA month navigation: a direct jump to July 2026 (V9678) returned HTTP 500. Only previous/next month links are accepted, so reaching other months needs step-by-step postbacks. Not retried. Summer time (DST) data from ESA is still unverified.
+أدلة جديدة اتجمعت للمراجعة (قراءة فقط، في scratchpad بس):
+- اختبار حساب: معادلة فلكية قياسية بطريقة الهيئة المصرية العامة للمساحة (الفجر 19.5 درجة، العشاء 17.5 درجة، العصر شافعي) وإحداثيات تقريبية للمدن، طابقت المساحة بفرق أقصاه دقيقة للقاهرة (1 و23 نوفمبر 2026) والإسكندرية (23 نوفمبر). يعني المواقيت ممكن تتحسب على الموبايل بدل ما تتسحب.
+- قوايم المدن: جدول المساحة 78 مدينة، والقايمة المنسدلة عندهم 83 (5 زيادة مش في جدول كل المدن: ابوتشت، ديربنجم، سمالوط، منوف + "كل المدن"). دار الإفتاء 78 مدينة وبتختلف عن المساحة في التهجئة (سفاجه/سفاجا)، والمساحة فيها مدينة 15 مايو، والإفتاء فيها عنصر اسمه "45792" (غلط في المصدر).
+- التنقل بين شهور المساحة: القفز المباشر ليوليو 2026 (V9678) رجّع HTTP 500. بس روابط الشهر السابق/التالي هي اللي بتتقبل، فالوصول لشهور تانية بيحتاج postback خطوة خطوة. ماعدتش المحاولة. بيانات التوقيت الصيفي عند المساحة لسه ماتأكدتش.
 
-Lessons recorded in docs/lessons-learned.md (premature data-pipeline design, no full roadmap, generated data in the app repo).
+الدروس اتسجلت في docs/lessons-learned.md (تصميم مسار بيانات بدري، مفيش خطة كاملة، بيانات ناتجة في مستودع التطبيق).
 
-Awaiting Ahmed's decision on the full roadmap.
+في انتظار قرار أحمد على الخطة الكاملة.
 
-## 2026-11-23 15:17 (Cairo) - Phase 2 addendum: Hijri API works from Ahmed's browser
+## 2026-11-23 15:17 (Cairo) - ملحق المرحلة 2: الـAPI الهجري شغال من متصفح أحمد
 
-Ahmed opened http://di107.dar-alifta.org/api/HijriDate?langID=1 in his own browser (screenshot). Reply is a bare JSON string: "13 جمادى الآخرة 1448" (day, month name, year, Arabic). So the API is live; it is only unreachable from the cloud session. Note the month spelling differs from ESA ("13 جماد الآخر 1448"), so a month-name mapping table is needed if both are used. Today's date matches ESA (13, 1448). Phase 3 plan is being presented to Ahmed; no code started.
+أحمد فتح http://di107.dar-alifta.org/api/HijriDate?langID=1 في متصفحه (صورة شاشة). الرد نص JSON بسيط: "13 جمادى الآخرة 1448" (اليوم، اسم الشهر، السنة بالعربي). يعني الـAPI شغال، ومش بيتفتح من جلسة السحابة بس. ملحوظة: اسم الشهر مكتوب بشكل مختلف عن المساحة ("13 جماد الآخر 1448")، فمحتاجين جدول توحيد أسماء الشهور لو استخدمنا الاتنين. تاريخ النهارده مطابق للمساحة (13، 1448). خطة المرحلة 3 بتتعرض على أحمد؛ لا كود.
 
-## 2026-11-23 15:15 (Cairo) - Phase 2 (read-only): Hijri API unreachable, ESA postback works
+## 2026-11-23 15:15 (Cairo) - المرحلة 2 (قراءة فقط): الـAPI الهجري مش واصل، وpostback المساحة شغال
 
-Approved by Ahmed: all phase-1 recommendations; phase 2 started on his explicit order. Network: di107.dar-alifta.org added to the personal "Mawaqit" environment allowlist (approved by Ahmed). No code changed; downloads kept in the scratchpad.
+أحمد وافق على: كل توصيات المرحلة 1؛ والمرحلة 2 بدأت بأمر صريح منه. الشبكة: اتضاف di107.dar-alifta.org لقايمة المسموح في بيئة "Mawaqit" الشخصية (بموافقة أحمد). لا تعديل كود؛ التحميلات في scratchpad.
 
-Findings:
-- Dar al-Ifta Hijri API (http://di107.dar-alifta.org/api/HijriDate?langID=1): NOT reachable from the cloud session. HTTP: "Could not resolve host" (no DNS record from here). HTTPS: connection reset by peer. Not a 403, no workaround attempted. Response format still unknown. Possible causes: the host is internal/stale or blocks cloud IPs. Needs another way to check (Ahmed's own browser, or ask Dar al-Ifta).
-- ESA postback works (HTTP 200): POST to /praytimes.aspx with __VIEWSTATE, __VIEWSTATEGENERATOR, __EVENTVALIDATION taken from the page, __EVENTTARGET=ctl00$placeholder1$Calendar1 and __EVENTARGUMENT=<day code>. The reply is the full table of 78 cities for that day (tested 2026-11-01, code 9801; table identical in layout to today's). Day code appears to be days since 2000-01-01 (9801 = 1 Nov 2026); month arrows use V-codes (V9770 previous, V9831 next month).
-- So one month from ESA = about 30 postbacks (one per day), all cities each. Hijri date comes with every row ("21 جماد الأول 1448"), so ESA alone can give Hijri dates.
-- Cross-check: Cairo on 2026-11-01 is identical in ESA (4:41, 6:9, 11:38, 2:45, 5:8, 6:27) and Dar al-Ifta (04:41, 06:09, 11:38, 02:45, 05:08, 06:27), with the Ifta dhuhr AM/PM typo again. They look like the same underlying data for Cairo; other cities not compared yet.
+النتايج:
+- الـAPI الهجري لدار الإفتاء (http://di107.dar-alifta.org/api/HijriDate?langID=1): مش بيتفتح من جلسة السحابة. بالـHTTP: "Could not resolve host" (مفيش DNS من هنا). بالـHTTPS: الاتصال اتقفل (connection reset). مش 403، ومحاولتش أي التفاف. شكل الرد كان مجهول. الأسباب المحتملة: الدومين داخلي أو قديم أو بيمنع عناوين السحابة. محتاج طريقة تانية للتأكد (متصفح أحمد، أو نسأل دار الإفتاء).
+- postback المساحة شغال (HTTP 200): POST لـ/praytimes.aspx بـ__VIEWSTATE و__VIEWSTATEGENERATOR و__EVENTVALIDATION من الصفحة، و__EVENTTARGET=ctl00$placeholder1$Calendar1 و__EVENTARGUMENT=<كود اليوم>. الرد جدول الـ78 مدينة كاملة لليوم ده (جربت 1 نوفمبر 2026، كود 9801؛ نفس شكل جدول النهارده). كود اليوم شكله عدد الأيام من 1 يناير 2000 (9801 = 1 نوفمبر 2026)، وأسهم الشهر بتستخدم أكواد V (V9770 السابق، V9831 التالي).
+- يعني شهر من المساحة = حوالي 30 postback (واحد لكل يوم)، بكل المدن. التاريخ الهجري جاي مع كل صف ("21 جماد الأول 1448")، فالمساحة لوحدها ممكن تدي تواريخ هجرية.
+- مقارنة: القاهرة يوم 1 نوفمبر 2026 متطابقة تمامًا بين المساحة (4:41، 6:9، 11:38، 2:45، 5:8، 6:27) ودار الإفتاء (04:41، 06:09، 11:38، 02:45، 05:08، 06:27)، مع غلطة "م" و"ص" في الظهر عند الإفتاء تاني. شكلهم نفس البيانات في القاهرة؛ باقي المدن ماتقارنتش.
 
-Recommendation for phase 3 (needs Ahmed's approval): ESA postback as the main source (all 78 cities, Hijri included); Dar al-Ifta /ar/prayer (Cairo, no query string) only as a cross-check; Hijri API dropped until we can reach it. Scrape politely (sequential, about 1 request/second, one run per month plus a daily refresh).
+توصية للمرحلة 3 (محتاجة موافقة أحمد): postback المساحة كمصدر أساسي (78 مدينة بالهجري)؛ دار الإفتاء /ar/prayer (القاهرة، من غير علامة استفهام) كمراجعة فقط؛ الـAPI الهجري يتأجل لحد ما نقدر نوصله. السحب بأدب (متتابع، حوالي طلب في الثانية، مرة في الشهر + تحديث يومي).
 
-Awaiting Ahmed's approval before phase 3 (parser + validator + JSON schema).
+في انتظار موافقة أحمد قبل المرحلة 3 (parser + validator + شكل JSON).
 
-## 2026-11-23 15:06 (Cairo) - Phase 1 (read-only): source pages inspected, all three open (HTTP 200)
+## 2026-11-23 15:06 (Cairo) - المرحلة 1 (قراءة فقط): فحص صفحات المصادر، التلاتة بتفتح (HTTP 200)
 
-Result: the 403 from the previous entry is gone. All three pages returned HTTP 200 via curl. HTML saved in the session scratchpad only (not in the repo). No code changed.
+النتيجة: الـ403 اللي في القيد اللي قبله اختفى. الصفحات التلاتة رجعت HTTP 200 بـcurl. الـHTML اتحفظ في scratchpad الجلسة بس (مش في المستودع). لا تعديل كود.
 
-Pages:
-- ESA https://www.esa.gov.eg/praytimes.aspx: 200, ~104 KB, ASP.NET WebForms behind Cloudflare. No CAPTCHA or challenge text found.
-  - Table 1 has 78 city rows. Columns: city, Gregorian date (YYYY-MM-DD), Hijri date text ("13 جماد الآخر 1448"), fajr, sunrise, dhuhr, asr, maghrib, isha. Times are 12h Arabic ("4:56 ص", not zero-padded: "5:2 ص").
-  - A dropdown (83 options, first is "كل المدن") and a calendar control. Changing them is an ASP.NET postback (__VIEWSTATE / __EVENTVALIDATION). No JSON or API found. Page shows today only (monthly data needs a postback, not tested yet).
-  - City names contain decorative tatweel ("القـاهـرة", "طنطــا") and need normalizing.
-  - robots.txt: no Disallow rules, only a Cloudflare content-signals comment block (no signal values set).
-- Dar al-Ifta https://www.dar-alifta.org/ar/prayer: 200, ~79 KB, plain server-rendered HTML.
-  - Table 0 = today for the default city (Cairo). Table 1 = full current month (30 rows): day, fajr, sunrise, dhuhr, asr, maghrib, isha.
-  - City dropdown has 78 options (ids 280898.. and names). Changing city calls GET /ar/Prayer/GetPrayer?town=<name> (returns HTML fragment) and /ar/Partial/_TimePrayer?town=<name> (today only).
-  - Data issue: dhuhr is printed with "م" (PM) as "11:41 م" although it is 11:41 AM. The source has a typo, so the parser must not trust the AM/PM marker for dhuhr.
-  - robots.txt: `Disallow: /ar/Partial/_TimePrayer/` and `Disallow: /*?` (any URL with a query string). So calling /ar/Prayer/GetPrayer?town=... contradicts robots.txt for the "all cities" path. The plain /ar/prayer page is not disallowed.
-- Dar al-Ifta Hijri page https://www.dar-alifta.org/ar/services/details/12/...: 200, ~49 KB. Descriptive article, no table. It documents an official public widget/API: http://di107.dar-alifta.org/api/HijriDate?langID=1 (1 Arabic, 2 English, 3 French, 4 German). That host (di107) is outside the allowed network list, so it was NOT called. Response format unknown.
+الصفحات:
+- المساحة https://www.esa.gov.eg/praytimes.aspx: 200، حوالي 104 كيلوبايت، ASP.NET WebForms ورا Cloudflare. مفيش CAPTCHA أو تحدي.
+  - الجدول الأول فيه 78 صف مدينة. الأعمدة: المدينة، التاريخ الميلادي (YYYY-MM-DD)، التاريخ الهجري كنص ("13 جماد الآخر 1448")، الفجر، الشروق، الظهر، العصر، المغرب، العشاء. الأوقات بنظام 12 ساعة بالعربي ("4:56 ص"، من غير صفر بادئ: "5:2 ص").
+  - قايمة منسدلة (83 اختيار، الأول "كل المدن") وكالندر. التغيير فيهم postback من ASP.NET (__VIEWSTATE / __EVENTVALIDATION). مفيش JSON ولا API. الصفحة بتعرض النهارده بس (الشهري محتاج postback، لسه ماجربتوش).
+  - أسماء المدن فيها تطويل زخرفي ("القـاهـرة"، "طنطــا") ومحتاجة تنضيف.
+  - robots.txt: مفيش Disallow، بس تعليق Cloudflare عن content-signals (من غير قيم).
+- دار الإفتاء https://www.dar-alifta.org/ar/prayer: 200، حوالي 79 كيلوبايت، HTML عادي من السيرفر.
+  - الجدول 0 = النهارده للمدينة الافتراضية (القاهرة). الجدول 1 = الشهر الحالي كله (30 صف): اليوم، الفجر، الشروق، الظهر، العصر، المغرب، العشاء.
+  - قايمة المدن فيها 78 اختيار (أرقام 280898.. وأسماء). تغيير المدينة بينادي GET /ar/Prayer/GetPrayer?town=<الاسم> (بيرجع جزء HTML) و/ar/Partial/_TimePrayer?town=<الاسم> (النهارده بس).
+  - مشكلة بيانات: الظهر مكتوب بـ"م" ("11:41 م") وهو 11:41 صباحًا. غلطة في المصدر، فالـparser ماينفعش يثق في ص/م للظهر.
+  - robots.txt: `Disallow: /ar/Partial/_TimePrayer/` و`Disallow: /*?` (أي رابط فيه علامة استفهام). يعني نداء /ar/Prayer/GetPrayer?town=... بيخالف robots.txt لمسار "كل المدن". صفحة /ar/prayer العادية مش ممنوعة.
+- صفحة التاريخ الهجري لدار الإفتاء https://www.dar-alifta.org/ar/services/details/12/...: 200، حوالي 49 كيلوبايت. مقال وصفي من غير جدول. بيشرح ويدجت/API رسمي متاح: http://di107.dar-alifta.org/api/HijriDate?langID=1 (1 عربي، 2 إنجليزي، 3 فرنسي، 4 ألماني). الدومين ده (di107) برا قايمة الشبكة المسموحة، فماندهتش عليه. شكل الرد كان مجهول.
 
-Bot blocking: none seen on these requests (no 403, no challenge, no CAPTCHA). Dar al-Ifta sets a TS... session cookie (F5 style) but did not require it. One request per page only; no load testing, no heavy scraping done.
+حجب الروبوتات: مفيش في الطلبات دي (لا 403 ولا تحدي ولا CAPTCHA). دار الإفتاء بتحط كوكي جلسة (TS...) بس مش مطلوبة. طلب واحد لكل صفحة؛ مفيش اختبار تحميل ولا سحب كبير.
 
-Proposed JSON output (needs Ahmed's decision):
-- Option A: one file per source per month, e.g. esa/2026-11.json, ifta/2026-11.json, each = {source, fetchedAt, month, cities:[{id, nameAr, days:[{date, hijri, fajr, sunrise, dhuhr, asr, maghrib, isha}]}]} with times as 24h "HH:mm", plus index.json listing months and cities. Pros: small files (app downloads only what it needs), easy to version/diff, matches "one month at a time" source limits. Cons: many files; a city list is repeated per file.
-- Option B: one big yearly file per source. Pros: simplest for the app. Cons: large download, ESA/Ifta do not publish a full year, so it would need many scrapes merged.
-- Option C: one file per city per month. Pros: smallest download for a user with one city. Cons: ~150 files per month, more Pages churn.
-- Recommendation: Option A with a shared cities.json (stable id, Arabic name, aliases, coordinates later) so ESA and Dar al-Ifta city names map to one id. Store times as 24h "HH:mm" and keep the raw Hijri string plus parsed {y,m,d}. Fix the dhuhr AM/PM typo in the parser with a sanity rule (dhuhr between 10:30 and 13:30) and keep a validation step that fails the run on bad data instead of publishing it.
+شكل JSON المقترح (محتاج قرار أحمد):
+- الخيار A: ملف لكل مصدر لكل شهر، مثلًا esa/2026-11.json وifta/2026-11.json، كل واحد = {source, fetchedAt, month, cities:[{id, nameAr, days:[{date, hijri, fajr, sunrise, dhuhr, asr, maghrib, isha}]}]} والأوقات 24 ساعة "HH:mm"، مع index.json بالشهور والمدن. مميزاته: ملفات صغيرة (التطبيق يحمّل اللي محتاجه بس)، سهل التتبع، بيناسب "شهر شهر". عيوبه: ملفات كتير، وقايمة المدن بتتكرر في كل ملف.
+- الخيار B: ملف سنوي كبير لكل مصدر. مميزاته: أبسط للتطبيق. عيوبه: تحميل كبير، والمساحة والإفتاء مابينشروش سنة كاملة فمحتاج سحوبات كتير تتدمج.
+- الخيار C: ملف لكل مدينة لكل شهر. مميزاته: أصغر تحميل لمستخدم مدينة واحدة. عيوبه: حوالي 150 ملف في الشهر وحركة Pages أكتر.
+- التوصية: الخيار A مع cities.json مشترك (معرّف ثابت، اسم عربي، أسماء بديلة، إحداثيات بعدين) عشان أسماء المساحة والإفتاء تتربط بمعرّف واحد. الأوقات 24 ساعة "HH:mm" ونحتفظ بالنص الهجري الخام + {y,m,d}. نصلّح غلطة ص/م في الظهر في الـparser بقاعدة منطقية (الظهر بين 10:30 و13:30)، وخطوة تحقق تفشّل التشغيل لو البيانات غلط بدل ما تنشرها.
 
-Open questions for Ahmed:
-1. Does the Dar al-Ifta robots.txt rule (no query-string URLs) block using /ar/Prayer/GetPrayer for the other cities? Recommendation: scrape only what the plain page serves, and ask Dar al-Ifta for permission or use the ESA postback for all cities.
-2. Is calling the official Hijri API on di107.dar-alifta.org allowed (network list)? Recommendation: yes, add it to the allowed hosts for a single test call.
-3. Where does the scraper run (GitHub Actions scheduled job is the recommendation)?
+أسئلة مفتوحة لأحمد:
+1. هل قاعدة robots.txt عند دار الإفتاء (مفيش روابط بعلامة استفهام) بتمنع استخدام /ar/Prayer/GetPrayer لباقي المدن؟ التوصية: نسحب اللي بتقدمه الصفحة العادية بس، ونطلب إذن من دار الإفتاء أو نستخدم postback المساحة لكل المدن.
+2. هل ينفع نادي الـAPI الهجري الرسمي على di107.dar-alifta.org (قايمة الشبكة)؟ التوصية: أيوه، نضيفه للمسموح لنداء تجريبي واحد.
+3. السكريبت يشتغل فين (التوصية: GitHub Actions بجدول زمني)؟
 
-Awaiting Ahmed's approval before any further phase.
+في انتظار موافقة أحمد قبل أي مرحلة تانية.
 
-## 2026-11-23 15:02 (Cairo) - Phase 0: infrastructure ready, sources unreachable from cloud session
+## 2026-11-23 15:02 (Cairo) - المرحلة 0: البنية جاهزة، والمصادر مش واصلة من جلسة السحابة
 
-Done:
-- Public repos: ahmedhatemamh/mawaqit-app (empty), ahmedhatemamh/mawaqit-data (README + docs/index.html + docs/CNAME).
-- GitHub Pages on mawaqit-data (main, /docs), custom domain data.ahmedhatem.work (DNS check pending).
-- CodeRabbit installed on both repos.
-- Cloudflare CNAME data -> ahmedhatemamh.github.io (DNS only).
-- Package name decided: work.ahmedhatem.mawaqit. App name: Mawaqit Misr.
+اللي اتعمل:
+- مستودعات عامة: ahmedhatemamh/mawaqit-app (فاضي)، وahmedhatemamh/mawaqit-data (README + docs/index.html + docs/CNAME).
+- GitHub Pages على mawaqit-data (الفرع main، المجلد /docs)، ودومين مخصص data.ahmedhatem.work (فحص DNS لسه معلّق).
+- CodeRabbit متثبت على المستودعين.
+- Cloudflare CNAME للدومين data -> ahmedhatemamh.github.io (DNS only).
+- اسم الباكدج اتحدد: work.ahmedhatem.mawaqit. اسم التطبيق: Mawaqit Misr.
 
-Findings:
-- esa.gov.eg and dar-alifta.org return 403 from the cloud session proxy (CONNECT tunnel failed), so page structure is unknown.
+النتايج:
+- esa.gov.eg وdar-alifta.org بيرجّعوا 403 من بروكسي جلسة السحابة (نفق CONNECT فشل)، فشكل الصفحات كان مجهول.
 
-Pending (needs Ahmed's approval):
-- Where the scraper runs and how we inspect the source pages.
-- Verify https://data.ahmedhatem.work opens and Enforce HTTPS is on.
-- Pending "Permission updates requested" on CodeRabbit and Claude apps (untouched on purpose).
+معلّق (محتاج موافقة أحمد):
+- السكريبت يشتغل فين وإزاي نفحص صفحات المصادر.
+- نتأكد إن https://data.ahmedhatem.work بيفتح وEnforce HTTPS شغال.
+- طلبات "Permission updates requested" معلّقة على تطبيقي CodeRabbit وClaude (ماتلمسناهاش عمدًا).

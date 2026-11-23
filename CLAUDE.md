@@ -17,6 +17,7 @@ Read STATUS.md first in every session.
 - Step by step. No phase starts without approval. Before each phase: goal, inputs/outputs, risks.
 - Final plan has no open options. A generic "approve all your suggestions" is not a decision.
 - Log work in STATUS.md (new entry at the top, Edit only, never Write over it).
+- STATUS.md edit: replace the header block (`# STATUS` + the "Newest entry first" line) with itself plus the new entry, then check `head -6` (the header line was lost once, 2026-11-23).
 - Extensible code, but no speculative infrastructure.
 
 ## Git
@@ -31,7 +32,9 @@ Read STATUS.md first in every session.
 - Request with plain `@coderabbitai review` only, and only when all checks are green and the PR is complete.
 - Fix all its comments in one batch, minimal change, pattern applied across the diff.
 - Do not resolve threads or write "Fixed" before its new review finishes. Never merge with open comments.
+- I fix, I do not close. Resolve a thread myself only when CodeRabbit's new review finished with no comments AND it left that thread open by mistake (Ahmed's order, 2026-11-23). CodeRabbit may auto-resolve threads by itself after a fix; that is not my action.
 - One review per hour, one PR at a time. Log new findings in docs/lessons-learned.md.
+- Subscribe to activity (subscribe_pr_activity) on EVERY PR I open, in any project repo, right after creating it. Not only the first one (Ahmed's order, 2026-11-23).
 
 ## Testing
 - No "done" without a real test run and its result shown: normal, missing data, wrong data, edge values, regression.
@@ -53,6 +56,9 @@ Read STATUS.md first in every session.
 - Subagents use Sonnet only; one writer at a time.
 - At 70% context: write a stop point in STATUS.md and tell Ahmed to compact.
 - One active session only; others read-only.
+
+## Standing rules
+- Full list of the adopted working rules (reply format, PR flow, auto-merge for non-guard PRs, guard files): `docs/standing-rules.md`. Read it at the start of every session. Added 2026-11-23 by Ahmed's order.
 
 ## Learning
 - Any mistake: record as lesson + rule in the same reply. Deferred items become a PR after the current one.
