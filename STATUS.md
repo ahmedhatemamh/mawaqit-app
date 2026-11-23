@@ -2,6 +2,14 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 16:38 (Cairo) - Spec R1-R4 confirmed by Ahmed
+
+- R1: reminder before a prayer = "did you pray?" (yes stops, no repeats every N minutes until the next prayer); reminder after = "get up to pray". N is edited by Ahmed (default 10). No prayer history for now.
+- R2: Ahmed will find an open-source adhan; meanwhile the user can pick any ringtone/song from the phone. No recording with unknown license is shipped.
+- R3: flash blinks with the alert like call/notification flash, no fixed duration, stops when the alert ends or is dismissed; off by default.
+- R4: confirmed.
+- docs/spec.md updated. Awaiting Ahmed's approval of the whole spec before phase 4.
+
 ## 2026-11-23 16:31 (Cairo) - Ahmed's answers on spec Q1-Q7 recorded in docs/spec.md
 
 - Approved: Q1 (look, editable after testing), Q2 option (a), Q3 no share/print, Q7 name. Q4-Q6 detailed: any-number-of-minutes reminders before/after, per prayer or shared, "did you pray?" follow-up that repeats until the next prayer, phone sound or adhan sound, camera flash alert, prohibited time (sunrise + 25 min) shown under sunrise with its own reminders, any reminder cancellable.

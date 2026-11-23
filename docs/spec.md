@@ -30,8 +30,8 @@ A light, simple app with an Islamic look that fully replaces the printed yearly 
 
 ### 3.3 Reminders
 - Per prayer (and sunrise, and the end of the prohibited time after sunrise): any number of reminders. Each reminder: before and/or after the time, by any number of minutes the user types (for example 30), on or off. Different reminders for different prayers, and the same reminder can be applied to several prayers or all of them. Any reminder can be removed or turned off from the app.
-- "Did you pray?" follow-up (Ahmed's design): a reminder placed before the next prayer asks "هل صليت؟" with two buttons right in the notification. Yes: it stops. No: it alerts again until the next prayer's time. See R1 for details to confirm.
-- Alert type, chosen per reminder: phone notification sound, or adhan sound (R2); optionally the camera flash blinking as a visible alert in addition to the sound (R3).
+- Two kinds of reminder moment (Ahmed's design): a reminder BEFORE a prayer asks "هل صليت؟" (did you pray?) with two buttons in the notification: Yes stops it, No repeats it every N minutes until the next prayer's time. A reminder AFTER the prayer time says "قم للصلاة" (get up to pray). N is a number Ahmed/the user edits (default 10). No prayer history is stored for now.
+- Alert type, chosen per reminder: the phone's notification sound, the built-in adhan, or any ringtone/song the user picks from the phone (R2); optionally the camera flash, which blinks on and off like a phone call or notification flash alert for as long as the alert is active, and stops when the alert ends or is dismissed (R3).
 - Android permissions (notifications, exact alarms) are requested in plain words only at the moment a reminder is created; battery-saving guidance (Xiaomi/Oppo/Realme) appears only if the phone is known to block alarms.
 
 ### 3.4 Widgets (all available, the user chooses)
@@ -98,4 +98,11 @@ New points to confirm (Ahmed):
 - Q6 Reminder before sunrise (end of fajr time): include as a reminder option? Recommendation: yes.
 - Q7 App icon and name: "Mawaqit Misr" in Arabic "مواقيت مصر". Confirm the name; the icon is designed in a later phase.
 
-Awaiting Ahmed's confirmation of R1-R4 and approval of the spec; phase 4 does not start before his approval.
+Confirmed by Ahmed (2026-11-23):
+
+- R1 The reminder before a prayer asks "did you pray?"; the reminder after it says "get up to pray". N (repeat interval) is a number he edits himself. No prayer history for now.
+- R2 Ahmed will look for an open-source (freely licensed) adhan recording himself; until then, and always as an option, the user can pick any ringtone or song from the phone. The app never ships a recording whose license is unknown.
+- R3 Flash: no fixed duration; it blinks on and off with the alert like a phone call or notification flash, and stops when the alert ends or is dismissed. Off by default, per reminder. Phones that restrict the torch in the background will just play the sound.
+- R4 Confirmed as written.
+
+Awaiting Ahmed's approval of the whole spec; phase 4 does not start before his approval.
