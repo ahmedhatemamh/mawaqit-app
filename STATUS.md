@@ -2,6 +2,10 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 15:17 (Cairo) - Phase 2 addendum: Hijri API works from Ahmed's browser
+
+Ahmed opened http://di107.dar-alifta.org/api/HijriDate?langID=1 in his own browser (screenshot). Reply is a bare JSON string: "13 جمادى الآخرة 1448" (day, month name, year, Arabic). So the API is live; it is only unreachable from the cloud session. Note the month spelling differs from ESA ("13 جماد الآخر 1448"), so a month-name mapping table is needed if both are used. Today's date matches ESA (13, 1448). Phase 3 plan is being presented to Ahmed; no code started.
+
 ## 2026-11-23 15:15 (Cairo) - Phase 2 (read-only): Hijri API unreachable, ESA postback works
 
 Approved by Ahmed: all phase-1 recommendations; phase 2 started on his explicit order. Network: di107.dar-alifta.org added to the personal "Mawaqit" environment allowlist (approved by Ahmed). No code changed; downloads kept in the scratchpad.
