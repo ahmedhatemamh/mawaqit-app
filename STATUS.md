@@ -2,6 +2,12 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 15:40 (Cairo) - Final plan written (Opus), awaiting Ahmed's decision
+
+- Full plan in docs/plan.md: fixed decisions D1-D5, new decisions N1-N8 (recommendations marked), phases 3-13.
+- New evidence: the header of https://www.dar-alifta.org/ar/prayer shows the official Hijri date ("13 جُمادى الآخرة 1448 هـ"), same as the di107 API Ahmed opened. It is HTTPS, reachable from the cloud, and the URL has no query string (allowed by robots.txt). This is the recommended Hijri source (N4).
+- No code started. Awaiting Ahmed's answers on N1-N8 and approval to start phase 3 (spec).
+
 ## 2026-11-23 15:35 (Cairo) - Ahmed's decisions on the plan review
 
 Decisions (Ahmed's words, summarized):
