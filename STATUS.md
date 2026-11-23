@@ -2,6 +2,19 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 15:23 (Cairo) - Plan review (Ahmed asked for a full critique and a full roadmap)
+
+Phase 3 is NOT started. Ahmed asked for a critique of phases 1-3 and a full plan for all remaining phases, then he decides.
+
+New evidence gathered for the review (read-only, scratchpad only):
+- Calculation test: a standard astronomical formula with the Egyptian General Authority of Survey method (fajr 19.5 deg, isha 17.5 deg, Shafi asr) and rough city coordinates matched ESA within 1 minute for Cairo (2026-11-01, 2026-11-23) and Alexandria (2026-11-23). So prayer times can likely be computed on the phone instead of scraped.
+- City lists: ESA table 78 cities, ESA dropdown 83 (5 extra not in the all-cities table: ابوتشت, ديربنجم, سمالوط, منوف + "كل المدن"). Dar al-Ifta 78; differs from ESA by spelling (سفاجه/سفاجا), ESA has مدينة 15 مايو, Ifta has an entry named "45792" (data error in the source).
+- ESA month navigation: a direct jump to July 2026 (V9678) returned HTTP 500. Only previous/next month links are accepted, so reaching other months needs step-by-step postbacks. Not retried. Summer time (DST) data from ESA is still unverified.
+
+Lessons recorded in docs/lessons-learned.md (premature data-pipeline design, no full roadmap, generated data in the app repo).
+
+Awaiting Ahmed's decision on the full roadmap.
+
 ## 2026-11-23 15:17 (Cairo) - Phase 2 addendum: Hijri API works from Ahmed's browser
 
 Ahmed opened http://di107.dar-alifta.org/api/HijriDate?langID=1 in his own browser (screenshot). Reply is a bare JSON string: "13 جمادى الآخرة 1448" (day, month name, year, Arabic). So the API is live; it is only unreachable from the cloud session. Note the month spelling differs from ESA ("13 جماد الآخر 1448"), so a month-name mapping table is needed if both are used. Today's date matches ESA (13, 1448). Phase 3 plan is being presented to Ahmed; no code started.
