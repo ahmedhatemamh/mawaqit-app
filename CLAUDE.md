@@ -57,5 +57,8 @@ Read STATUS.md first in every session.
 - At 70% context: write a stop point in STATUS.md and tell Ahmed to compact.
 - One active session only; others read-only.
 
+## Standing rules
+- Full list of the adopted working rules (reply format, PR flow, auto-merge for non-guard PRs, guard files): `docs/standing-rules.md`. Read it at the start of every session. Added 2026-11-23 by Ahmed's order.
+
 ## Learning
 - Any mistake: record as lesson + rule in the same reply. Deferred items become a PR after the current one.
