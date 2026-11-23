@@ -1,6 +1,6 @@
-# Lessons learned
+# الدروس المستفادة
 
-Newest first. Each entry: what happened, the lesson, and the rule that follows.
+الأحدث أولًا. كل درس: اللي حصل، والدرس، والقاعدة اللي بتتبعه.
 
 ## 2026-11-23 - بدأت سحب بيانات بالجملة قبل قراءة شروط استخدام الموقع
 
@@ -12,22 +12,22 @@ Newest first. Each entry: what happened, the lesson, and the rule that follows.
 
 - اللي حصل: كتبت `docs/plan.md` و`docs/spec.md` وSTATUS.md ودروس سابقة بالإنجليزي، رغم إن قاعدة المشروع إن كل التواصل مع أحمد بالعربي المصري والكود بس بالإنجليزي. أحمد نبّهني.
 - الدرس: ملفات الخطة والمواصفات والحالة والدروس هي تواصل مع أحمد، مش كود.
-- القاعدة: كل ملفات `docs/` وSTATUS.md بالعربي المصري البسيط من دلوقتي، والإنجليزي للكود وأسماء الملفات والأسماء التقنية بس. الملفات اللي اتكتبت بالإنجليزي تتترجم.
+- القاعدة: كل ملفات `docs/` وSTATUS.md بالعربي المصري البسيط من دلوقتي، والإنجليزي للكود وأسماء الملفات والأسماء التقنية بس. الملفات اللي اتكتبت بالإنجليزي تتترجم (اتترجمت docs/plan.md وdocs/spec.md وهذا الملف).
 
-## 2026-11-23 - Data pipeline designed before checking a simpler path
+## 2026-11-23 - صممت مسار البيانات قبل ما أتأكد من طريق أبسط
 
-- What happened: phases 1-3 designed a scraper, a JSON layout and a publishing flow before checking whether prayer times could simply be computed. A 1-minute match with ESA using the standard Egyptian method showed the scraper may not be needed as the main source.
-- Lesson: the cheapest possible approach must be ruled out with a quick test before designing infrastructure.
-- Rule: before designing any data ingestion, run a small prototype of the simplest alternative (calculation, official API, static file) and show the comparison.
+- اللي حصل: المراحل 1 إلى 3 صممت سكريبت سحب وشكل JSON وطريقة نشر قبل ما أشوف هل ممكن ببساطة نحسب المواقيت. اختبار سريع بالطريقة المصرية المعتمدة طابق المساحة بفرق دقيقة، يعني السحب ممكن مايبقاش المصدر الأساسي.
+- الدرس: أرخص طريق ممكن لازم يتجرب بسرعة قبل ما نصمم بنية تحتية.
+- القاعدة: قبل تصميم أي سحب بيانات، أجرب نموذج صغير لأبسط بديل (حساب، API رسمي، ملف ثابت) وأعرض المقارنة.
 
-## 2026-11-23 - Phases planned one at a time with no full roadmap
+## 2026-11-23 - التخطيط مرحلة بمرحلة من غير خطة كاملة
 
-- What happened: each phase was proposed only after the previous one finished, so there was no view of the whole project (Android app, notifications, widgets, release).
-- Lesson: phase-by-phase approvals need a full roadmap behind them.
-- Rule: keep a full roadmap of all phases (goal, deliverable, approval gate) and update it whenever a phase changes the picture.
+- اللي حصل: كل مرحلة اتقترحت بعد ما اللي قبلها تخلص، فمكانش في رؤية كاملة للمشروع (التطبيق والتنبيهات والويدجات والنشر).
+- الدرس: موافقات المراحل لازم يكون وراها خطة كاملة.
+- القاعدة: خطة كاملة لكل المراحل (الهدف والناتج وبوابة الموافقة)، وتتحدث كل ما مرحلة تغيّر الصورة.
 
-## 2026-11-23 - Generated data proposed inside the app repo
+## 2026-11-23 - اقترحت بيانات ناتجة جوه مستودع التطبيق
 
-- What happened: the phase-3 plan put generated JSON (out/) in mawaqit-app, mixing code and data, although mawaqit-data exists for that.
-- Lesson: generated data and code have different life cycles.
-- Rule: generated data is published only to mawaqit-data; mawaqit-app holds code and small test fixtures only.
+- اللي حصل: خطة المرحلة 3 حطت ملفات JSON الناتجة (out/) في mawaqit-app، وده بيخلط الكود بالبيانات رغم إن mawaqit-data موجود للبيانات.
+- الدرس: الكود والبيانات الناتجة لهم دورات حياة مختلفة.
+- القاعدة: البيانات الناتجة تتنشر على mawaqit-data بس، ومستودع mawaqit-app فيه كود وبيانات اختبار صغيرة بس.

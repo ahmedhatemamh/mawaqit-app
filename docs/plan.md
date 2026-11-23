@@ -1,80 +1,65 @@
-# Mawaqit Misr - full plan
+# مواقيت مصر (Mawaqit Misr) - الخطة الكاملة
 
-Status: draft for Ahmed's approval (2026-11-23). Items marked "N#" are new decisions awaiting approval; the plan assumes the recommended choice.
+الحالة: مسودة بانتظار موافقة أحمد (محدّثة 2026-11-23). القرارات الجديدة تحمل رقم "N#" وتوصياتي ما لم يقل أحمد غير ذلك.
 
-## Fixed decisions (Ahmed, 2026-11-23)
+## القرارات الثابتة (أحمد، 2026-11-23)
 
-- D1 Prayer times are computed on the phone (Egyptian General Authority of Survey method). On the 1st, 11th and 21st of every Gregorian month the app goes online, compares with the official times, and corrects itself if different.
-- D2 Cities: ESA city list with coordinates, plus optional GPS.
-- D3 Tolerance vs ESA: zero minutes.
-- D4 Hijri date: Dar al-Ifta is the only source. No manual adjustment ever. The app checks only on Hijri days 27, 28, 29, 30, 1, 2, 3.
-- D5 Minimum Android 8 (API 26).
-- Widgets: several designs, all available at once (all prayers + next prayer).
-- Play Console: Ahmed's existing paid account is used.
+- D1 مواقيت الصلاة تتحسب على الموبايل. في أيام 1 و11 و21 من كل شهر ميلادي التطبيق يتصل بالإنترنت ويقارن حسابه بالمواقيت الرسمية، ولو في فرق يصحح نفسه.
+- D2 المدن: قايمة مدن الهيئة المصرية العامة للمساحة بإحداثياتها، مع GPS اختياري.
+- D3 الفرق المسموح عن المساحة: صفر دقيقة.
+- D4 التاريخ الهجري: مصدره دار الإفتاء فقط. مفيش تعديل يدوي نهائيًا. التطبيق يراجع دار الإفتاء في أيام 29 و30 و1 و2 و3 من الشهر الهجري فقط، وباقي الأيام يعدّ لوحده من غير مراجعة.
+- D5 أقل إصدار أندرويد: 8 (API 26).
+- الويدجات: أكتر من تصميم متاحين مع بعض (كل الصلوات + الصلاة الجاية).
+- Play Console: أحمد عنده حساب مدفوع ومنشور عليه تطبيق بالفعل.
 
-## New decisions (recommended choice in bold)
+## القرارات اللي اتحسمت (إجابات أحمد على N1-N8)
 
-- N1 Who reads the official sites: **GitHub Actions reads ESA and Dar al-Ifta and publishes small JSON files on data.ahmedhatem.work (HTTPS); the phone downloads those files.** Alternative: every phone scrapes ESA itself (fragile ASP.NET postback inside the app, an app update for every site change, many phones hitting a government site).
-- N2 What "correct" means: **the official file for the month overrides computed times for every day it covers.** Computed times are the fallback only when no official file is available. This is what makes D3 (zero) hold even if the formula is off by a minute somewhere.
-- N3 GPS mode: **compute for the GPS point, then apply the per-prayer difference (official minus computed) of the nearest ESA city for that day.** Alternative: GPS uses pure calculation with no correction.
-- N4 Hijri route: **Actions reads the Hijri date shown in the header of https://www.dar-alifta.org/ar/prayer once a day and publishes hijri.json; the phone downloads it only on Hijri days 27-3.** Alternative: the phone calls http://di107.dar-alifta.org/api/HijriDate directly (plain HTTP, needs a cleartext exception, unreachable from cloud).
-- N5 Phone offline during the whole 27-3 window: **keep counting days and show a small "unconfirmed" mark next to the Hijri date until Dar al-Ifta confirms.** No manual adjustment (D4).
-- N6 Missed check (phone off on the 1st/11th/21st or a Hijri check day): **retry once a day until it succeeds, until the next scheduled check.**
-- N7 Cross-check: **Actions compares ESA with Dar al-Ifta for Cairo; if they differ it opens a GitHub issue for Ahmed and changes nothing automatically.** ESA stays the official reference for times.
-- N8 Where the scraper lives: **in mawaqit-data** (code + scheduled workflow + published files in one repo; the workflow publishes with its own token, no extra secret). Alternative: scraper in mawaqit-app pushing to mawaqit-data (needs a cross-repo token in Secrets).
+- N1 موافق: GitHub Actions يقرا المواقع الرسمية وينشر ملفات، والموبايل يحمّلها. الشرط: يحصل تلقائيًا من غير أي تدخل من المستخدم.
+- N2 موافق بتوضيح: حسابنا تقدير وممكن ما يطابقش المساحة طول السنة. فالموبايل في 1 و11 و21 يشوف هل حسابه مطابق بالظبط، ولو لا يستبدله بالرسمي. وهنسجل لمدة سنة الفرق بين حسابنا والمساحة (لكل مدينة وصلاة ويوم) عشان نعرف الفرق بيحصل إمتى وفين.
+- N3 موافق: وضع GPS يدوي (المستخدم يختار مدينة) أو تلقائي (من موقع الموبايل)، والموبايل يقرر لوحده.
+- N4 اتغير: التاريخ الهجري ممكن يتغير في أيام 29 و30 و1 و2 و3 بس. الموبايل يراجع دار الإفتاء في الأيام دي فقط.
+- N5 موافق: يكمل عدّ الأيام، وعلامة صغيرة "غير مؤكد" لحد ما دار الإفتاء تأكد. من غير تعديل يدوي.
+- N6 موافق: لو فات يوم مراجعة، يحاول مرة كل يوم لحد ما ينجح.
+- N7 اتغير: لو المساحة ودار الإفتاء اختلفوا، الأول نعرف الفرق دايم ولا مؤقت وفي أنهي صلوات ومدن، ونسجله، وبعدين نفتح issue لأحمد. مفيش تغيير تلقائي.
+- N8 موافق: كود السحب في مستودع mawaqit-data.
 
-## Resolved decisions (Ahmed's answers, 2026-11-23)
+## مبادئ المنتج (أحمد)
 
-- N1 approved: GitHub Actions reads the official sites and publishes files; the phone downloads them. Key requirement: it must happen automatically, the user never does anything.
-- N2 approved with a clear purpose: our formula is only an estimate and may not match ESA all year. So the phone checks on the 1st, 11th and 21st whether its calculation matches the official times exactly; if not, the official data replaces it. We also measure, for one full year, the difference between our calculation and ESA (per city, per prayer, per day) in a published log, so we learn when and where it differs.
-- N3 approved: GPS correction can be manual (user picks a city) or automatic (phone location), the phone decides by itself with no extra step for the user.
-- N4 changed: Hijri date can change only on Hijri days 29, 30, 1, 2, 3 (previously 27-3). The phone checks Dar al-Ifta only on those days; on all other days the date just counts by itself and is not re-checked.
-- N5 approved (count days, small "unconfirmed" mark until Dar al-Ifta confirms, no manual adjustment).
-- N6 approved (daily retry after a missed check).
-- N7 changed: when ESA and Dar al-Ifta differ, the pipeline first checks whether the difference is permanent or temporary, and in which prayers (and cities), and records it in the log before opening an issue for Ahmed. No automatic change.
-- N8 approved: the scraper lives in mawaqit-data.
+- بسيط وخفيف وبهوية إسلامية، من غير تعقيد ومن غير إعدادات.
+- أقصى تدخل من المستخدم: اختيار الويدجات، وضبط التنبيهات (قبل الصلوات الجاية أو لصلاة محددة، بفرق ثابت أو متغير، وأكتر من تنبيه). مفيش حاجة تانية.
+- التطبيق يغني عن النتيجة المطبوعة اللي بتتوزع سنويًا (شاشة "نتيجة السنة").
 
-## Product principles (Ahmed)
+## السجل الرسمي (تفسير بانتظار تأكيد أحمد)
 
-- Simple, light, Islamic identity (look and wording), no complexity, no setup for the user.
-- The only things the user may do: choose widgets, and set reminders: before upcoming prayers, or for one specific prayer, with a fixed or variable offset, and more than one reminder per prayer. Nothing else is asked of the user.
+أحمد قصد النتيجة المطبوعة سنويًا. التطبيق يعرض نفس المعلومات: كل يوم في السنة، التاريخ الميلادي والهجري والمواقيت الست. داخليًا، ملف الرسمي (مواقيت + هجري محدّث) يستخدمه التطبيق كمصدر تصحيح.
 
-## Official data record (to be confirmed by Ahmed)
+## الموقف القانوني من المصادر (جديد، 2026-11-23)
 
-Ahmed asked for an "official result" record that holds the official prayer times with the up-to-date Hijri date. Interpretation: one published official dataset, per city per day, containing the six official times (from ESA, checked against Dar al-Ifta) and the Hijri date (from Dar al-Ifta, updated when it changes), which the phone uses as the correction source. Awaiting Ahmed's confirmation that this is the meaning.
+- صفحة شروط استخدام المساحة (TERMSOFUSE.aspx) تمنع "نسخ أو إعادة طباعة أو نشر أو تحميل أو تحويل أو استخدام" محتوى الموقع. ملف robots.txt عندهم مفيهوش منع.
+- دار الإفتاء: مفيش صفحة شروط استخدام ظاهرة. عندهم robots.txt بيمنع الروابط اللي فيها علامة استفهام. وعندهم خدمة تاريخ هجري رسمية متاحة لأصحاب المواقع.
+- قرار أحمد: نحسب على الموبايل، ومننشرش بيانات المساحة حاليًا. واستخدام بيانات المساحة داخليًا للمقارنة وضبط المعادلة فقط.
+- المطلوب من الهيئة (رسالة): طريقة الحساب بالظبط، وإذن باستخدام المواقيت بشكل غير ربحي في تطبيق مجاني بحجم استخدام محدود. المسودة في `docs/esa-letter.md`.
+- لحد ما ترد الهيئة: مفيش اعتماد على بيانات المساحة في التطبيق (خطوة التصحيح من البيانات الرسمية تتأجل، والتطبيق يعتمد على الحساب).
 
-## Changes to the phase table
+## مراحل المشروع
 
-- Phase 3 (spec): written around the product principles above.
-- Phase 4: also produces the first difference report (our formula vs ESA).
-- Phase 5: adds the one-year difference log, the permanent-or-temporary analysis (N7), and the official data record; Hijri read daily but consumed by the phone on days 29, 30, 1, 2, 3 only.
-- Phase 8 (sync): Hijri checks only on days 29, 30, 1, 2, 3; times checks on the 1st, 11th, 21st.
-- Phase 11 (widgets): four designs available together, user picks.
-- Phase 12: Ahmed already has a paid Play account with a published app; only the new app entry and signing remain.
+كل مرحلة: الهدف والمدخلات والمخرجات والمخاطر الأول، وتبدأ بموافقة أحمد، وتنتهي باختبارات تتعرض وسجل في STATUS.md. الكود يعدي بفرع موضوعي + PR + CodeRabbit.
 
-## Answer to D6
-
-D1 answered it, with one change: the scraper is no longer a weekly monitor. It becomes the official-data pipeline that the 1/11/21 checks and the Hijri checks depend on (N1, N4).
-
-## Phases
-
-Every phase: goal, inputs/outputs and risks presented first; starts only on Ahmed's approval; ends with tests shown and a STATUS.md entry. Code goes through a topic branch + PR + CodeRabbit.
-
-| # | Phase | Output | Main risks |
+| # | المرحلة | الناتج | المخاطر الأساسية |
 |---|---|---|---|
-| 0-2 | Infrastructure, source inspection | Done | - |
-| 3 | Product spec | docs/spec.md: screens, notification behaviour (adhan sound, pre-reminder), language, the widget designs, the check schedules, what each screen promises | Open questions for Ahmed; no code |
-| 4 | Calculation proof to zero | Script fetches ESA month by month (step via previous/next only, 1 request/second, about 300 requests once) for all cities over several months including summer (DST); city coordinate table fitted to reproduce ESA exactly; report: number of minutes differing per city | Zero may not be reachable for every city/day; N2 covers that. ESA may block repeated requests: stop and report |
-| 5 | Data pipeline in mawaqit-data | Scheduled workflow: ESA current + next month on the 1st, 11th, 21st (before the phone checks); Dar al-Ifta Hijri daily; validation that fails the run instead of publishing bad data; Cairo cross-check (N7); files: cities.json, esa/YYYY-MM.json, hijri.json | Cloudflare may block GitHub runners; site layout changes; Hijri change time unknown (measured here) |
-| 6 | Android skeleton + CI | Kotlin + Jetpack Compose, minSdk 26, build + unit tests + lint on GitHub Actions | Android SDK/Gradle hosts may need network approval in the cloud session |
-| 7 | Core logic (Kotlin) | Prayer engine (golden tests vs phase-4 data), official-override (N2), GPS correction (N3), Hijri day counting + confirmation (N4, N5) | Two implementations (script + Kotlin) must agree: golden tests guard it |
-| 8 | Sync | WorkManager jobs: times on 1/11/21, Hijri on days 27-3, daily retry (N6), all offline-safe | Android may delay background work |
-| 9 | Main UI | Today screen, city/GPS choice, Hijri + Gregorian date, next prayer | - |
-| 10 | Reminders | Exact alarms (Android 12-14 permissions), reschedule after reboot / time or zone change / DST, battery guidance for Xiaomi, Oppo, Realme | Hardest phase; OEM battery killers |
-| 11 | Widgets | W1 small: next prayer + countdown. W2 strip: six prayers in a row, next highlighted. W3 large: Hijri + Gregorian date, six prayers, next highlighted, countdown. W4 tall: six prayers in a column. All four available; Ahmed picks/edits later | Widget refresh limits: updates driven by alarms at each prayer |
-| 12 | Signing + release | New app entry in Ahmed's existing Play account, Play App Signing, upload keystore created on Ahmed's PC (step-by-step) and stored only in GitHub Secrets, privacy policy page, internal testing track | Release only on Ahmed's explicit order |
-| 13 | Failure alerts | Any failed workflow or validation opens an issue; the app shows when data is stale | - |
+| 0-2 | البنية والفحص | تمت | - |
+| 3 | المواصفات | docs/spec.md (تمت، بانتظار موافقة نهائية) | - |
+| 4 | إثبات الحساب | جارية: سنة 2026 كاملة اتسحبت، والمعادلة طابقت 99.25% بأقصى فرق دقيقة. السكريبتات في فرع research/esa-formula | الوصول لصفر مش مضمون، والإذن القانوني |
+| 5 | سكريبت البيانات في mawaqit-data | يتأجل لحد ما الهيئة ترد. الجزء الهجري (دار الإفتاء) ممكن يتقدم | حجب GitHub، تغيير شكل الصفحات |
+| 6 | هيكل تطبيق أندرويد + CI | Kotlin وJetpack Compose، minSdk 26، بناء واختبارات على GitHub Actions | شبكة بيئة السحابة |
+| 7 | المحرك في Kotlin | المعادلة المختارة بنتائجها الذهبية من المرحلة 4 | نسختين من المعادلة لازم تتطابق |
+| 8 | المزامنة | WorkManager: 1/11/21 للمواقيت، و29-3 للهجري، وإعادة يومية | تأخير الخلفية |
+| 9 | الشاشات | اليوم، نتيجة السنة، المدينة/GPS | - |
+| 10 | التنبيهات | منبهات دقيقة (أندرويد 12-14)، "هل صليت؟"، وبعد الصلاة "قم للصلاة"، فلاش، نغمة من الموبايل أو أذان | أصعب مرحلة، توفير البطارية |
+| 11 | الويدجات | W1 صغير، W2 شريط، W3 كبير، W4 طولي، كلهم متاحين | حدود تحديث الويدجات |
+| 12 | التوقيع والنشر | تطبيق جديد في حساب أحمد، keystore في GitHub Secrets فقط، سياسة خصوصية، اختبار داخلي | النشر بأمر أحمد فقط |
+| 13 | تنبيهات الفشل | أي فشل يفتح issue، والتطبيق يوضح لو البيانات قديمة | - |
 
-## Evidence behind the plan
+## الأدلة اللي بُنيت عليها الخطة
 
-See STATUS.md entries of 2026-11-23: ESA postback works (all cities per day), formula matched ESA within 1 minute with rough coordinates, Dar al-Ifta header shows the official Hijri date over HTTPS, direct month jumps on ESA return 500.
+مسجلة في STATUS.md ليوم 2026-11-23: جداول المساحة اليومية لكل المدن، المعادلة مطابقة 99.25%، التاريخ الهجري من دار الإفتاء عبر HTTPS، والتنقل بين شهور المساحة بالأسهم فقط.
