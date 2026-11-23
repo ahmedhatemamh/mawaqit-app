@@ -17,6 +17,7 @@ Read STATUS.md first in every session.
 - Step by step. No phase starts without approval. Before each phase: goal, inputs/outputs, risks.
 - Final plan has no open options. A generic "approve all your suggestions" is not a decision.
 - Log work in STATUS.md (new entry at the top, Edit only, never Write over it).
+- STATUS.md edit: replace the header block (`# STATUS` + the "Newest entry first" line) with itself plus the new entry, then check `head -6` (the header line was lost once, 2026-11-23).
 - Extensible code, but no speculative infrastructure.
 
 ## Git
