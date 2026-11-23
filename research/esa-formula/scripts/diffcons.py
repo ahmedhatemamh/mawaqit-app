@@ -1,5 +1,7 @@
-"""Is there ANY per-day EoT e_d and per-city lon u_c with round(C_d - u_c - e_d) == ESA dhuhr for all (c,d)?
-Find the smallest widening delta (minutes) of the rounding interval that makes the system feasible."""
+"""Is there ANY per-day EoT e_d and per-city lon u_c with C_d - u_c - e_d inside the closed interval
+[ESA dhuhr - 0.5, ESA dhuhr + 0.5] for all (c,d)? This is a closed-interval relaxation: a value on a shared
+endpoint (for example 719.5) counts as matching both 719 and 720, which no real rounding rule does.
+Finds the smallest widening delta (minutes) of the interval that makes the system feasible."""
 import sys, numpy as np
 sys.path.insert(0, sys.argv[1] + "/scripts")
 import solar
@@ -28,7 +30,7 @@ def feasible(delta):
     return False, dist
 lo, hi = 0.0, 1.0
 ok0, _ = feasible(0.0)
-print("feasible with exact rounding intervals:", ok0)
+print("feasible as a closed-interval relaxation (not proof of exact rounding):", ok0)
 if not ok0:
     if not feasible(hi)[0]:
         raise SystemExit("input error: infeasible even with a widening of %.1f min" % hi)

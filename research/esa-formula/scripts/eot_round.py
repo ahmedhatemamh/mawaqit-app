@@ -19,4 +19,4 @@ for name, f in tests:
             E = np.array([f(solar.jd_of(d) + off) for c in cities for d in D[c]])
         A = A0 - E; B = B0 - E
         globals()["A"], globals()["B"] = A, B
-        print("%-22s %-11s exact feasible: %-5s  max dev needed %.3f s" % (name, where, feas(np.zeros(nd), 0.0), mindelta(np.zeros(nd)) * 60), flush=True)
+        print("%-22s %-11s closed-interval feasible: %-5s  max dev needed %.3f s" % (name, where, feas(np.zeros(nd), 0.0), mindelta(np.zeros(nd)) * 60), flush=True)

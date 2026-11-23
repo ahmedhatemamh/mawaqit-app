@@ -18,4 +18,4 @@ for name, f in (("VSOP dT69", lambda jd: vsop.sun_vsop(jd, 69)[1]), ("Meeus shor
     E = build(f)
     A = A0 - E; B = B0 - E
     print("%-12s per-city transit: max per-day deviation needed %.3f s" % (name, mindelta(np.zeros(nd)) * 60), flush=True)
-    print("   exact without any correction?", feas(np.zeros(nd), 0.0))
+    print("   closed-interval feasible without any correction?", feas(np.zeros(nd), 0.0))
