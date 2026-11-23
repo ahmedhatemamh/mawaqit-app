@@ -18,7 +18,7 @@ A light, simple app with an Islamic look that fully replaces the printed yearly 
 
 ### 3.1 Today (home)
 - City name (automatic, with a small way to switch city), Gregorian date, Hijri date (with a small "unconfirmed" mark when not yet confirmed by Dar al-Ifta).
-- Six rows: fajr, sunrise, dhuhr, asr, maghrib, isha. The next prayer is highlighted with a live countdown. Sunrise is shown as a time, not a prayer.
+- Six rows: fajr, sunrise, dhuhr, asr, maghrib, isha. The next prayer is highlighted with a live countdown. Sunrise is shown as a time, not a prayer, with a small line under it: the end of the prohibited time, sunrise + 25 minutes (Ahmed's value, one constant in the code, not a setting).
 - Works with no internet.
 
 ### 3.2 Year timetable (replaces the printed paper)
@@ -26,12 +26,12 @@ A light, simple app with an Islamic look that fully replaces the printed yearly 
 - Uses the official data where available and the computed values elsewhere; the user is not told which (the numbers must match the official ones, D3 = zero difference).
 - Hijri dates: confirmed ones from Dar al-Ifta; dates for later months are estimates and carry a small mark (see Q2), because the Hijri month start is announced only around the 29th/30th.
 - Works offline; the data is already on the phone.
-- Option to share/print a month (Q3).
+- No share/print option (Q3 answered: not needed if the app works as Ahmed imagines).
 
 ### 3.3 Reminders
-- Per prayer (and sunrise): a list of reminders, more than one allowed. Each reminder: when = before / at / after the prayer, by a number of minutes (see Q4 for fixed and variable), on or off.
-- "Reminder for the upcoming prayer, whichever it is" as one option, plus "for a specific prayer".
-- Sound: system notification sound by default; adhan option (Q5).
+- Per prayer (and sunrise, and the end of the prohibited time after sunrise): any number of reminders. Each reminder: before and/or after the time, by any number of minutes the user types (for example 30), on or off. Different reminders for different prayers, and the same reminder can be applied to several prayers or all of them. Any reminder can be removed or turned off from the app.
+- "Did you pray?" follow-up (Ahmed's design): a reminder placed before the next prayer asks "هل صليت؟" with two buttons right in the notification. Yes: it stops. No: it alerts again until the next prayer's time. See R1 for details to confirm.
+- Alert type, chosen per reminder: phone notification sound, or adhan sound (R2); optionally the camera flash blinking as a visible alert in addition to the sound (R3).
 - Android permissions (notifications, exact alarms) are requested in plain words only at the moment a reminder is created; battery-saving guidance (Xiaomi/Oppo/Realme) appears only if the phone is known to block alarms.
 
 ### 3.4 Widgets (all available, the user chooses)
@@ -71,7 +71,24 @@ A light, simple app with an Islamic look that fully replaces the printed yearly 
 
 Qibla, Quran, adhkar, other countries, user accounts, manual date adjustment (forbidden by Ahmed's rule D4), themes, more languages.
 
-## 7. Open questions for Ahmed
+## 7. Ahmed's answers (2026-11-23)
+
+- Q1 approved (green/gold Islamic look, light and dark automatic), open to change after testing.
+- Q2 option (a): estimated Hijri dates for later months, with a small mark.
+- Q3 no share/print.
+- Q4 as described in 3.3: any number of minutes, several reminders, before and/or after, different per prayer or the same for several/all, plus the "did you pray?" follow-up.
+- Q5 phone notification sound or adhan sound, user chooses; also camera flash as an eye-catching alert.
+- Q6 sunrise row has a small line under it with the prohibited time (sunrise + 25 minutes); reminders possible for both; any reminder can be cancelled in the app.
+- Q7 name approved: Mawaqit Misr / مواقيت مصر.
+
+New points to confirm (Ahmed):
+
+- R1 "Did you pray?" meaning and repeat. My reading: at the offset the user chose before the next prayer, a notification asks about the prayer whose time is ending. Yes: stop. No: ask again every N minutes until the next prayer's time. For fajr the end is sunrise. Options for N: (a) fixed 10 minutes (recommended, simplest); (b) one number the user chooses, default 10. Nothing about the answer is stored or sent (no prayer history), unless Ahmed wants a history later.
+- R2 "صوت انولة": I read it as the adhan sound; please confirm. A recording needs one we are allowed to use legally (own recording, or a free license); I do not copy one from the internet without permission.
+- R3 Camera flash: blinks for at most 10 seconds or until dismissed, off by default, per reminder; uses the torch only (no camera access); some phones restrict it in the background or when the battery is low, so it can fail on some devices and the sound still plays.
+- R4 Prohibited time after sunrise: shown as "until HH:mm" (sunrise + 25) under the sunrise row; it is reminder-capable like the prayers. No other prohibited times were requested, none added.
+
+## 8. Original questions (answered above, kept for history)
 
 - Q1 Look and feel: calm green/gold Islamic style with an Arabic calligraphy font, light and dark. Recommendation: yes, follows the phone's light/dark mode automatically.
 - Q2 Hijri dates later in the year: Dar al-Ifta announces month starts only about a day before. Options: (a) show estimated Hijri dates for later months with a small mark (recommended, replaces the printed paper); (b) show Hijri only for the current confirmed month (less useful, but never wrong); (c) show estimated dates with no mark (risky: may be off by one day). The estimate uses the Umm al-Qura calendar, which can differ from Dar al-Ifta by a day.
@@ -81,4 +98,4 @@ Qibla, Quran, adhkar, other countries, user accounts, manual date adjustment (fo
 - Q6 Reminder before sunrise (end of fajr time): include as a reminder option? Recommendation: yes.
 - Q7 App icon and name: "Mawaqit Misr" in Arabic "مواقيت مصر". Confirm the name; the icon is designed in a later phase.
 
-Awaiting Ahmed's answers; phase 4 does not start before his approval.
+Awaiting Ahmed's confirmation of R1-R4 and approval of the spec; phase 4 does not start before his approval.

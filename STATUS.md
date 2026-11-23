@@ -2,6 +2,12 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 16:31 (Cairo) - Ahmed's answers on spec Q1-Q7 recorded in docs/spec.md
+
+- Approved: Q1 (look, editable after testing), Q2 option (a), Q3 no share/print, Q7 name. Q4-Q6 detailed: any-number-of-minutes reminders before/after, per prayer or shared, "did you pray?" follow-up that repeats until the next prayer, phone sound or adhan sound, camera flash alert, prohibited time (sunrise + 25 min) shown under sunrise with its own reminders, any reminder cancellable.
+- New points to confirm: R1 ("did you pray?" meaning and repeat interval), R2 ("انولة" read as adhan, needs a legally usable recording), R3 (flash limits), R4 (prohibited time display).
+- Spec stays a draft until Ahmed confirms R1-R4. No code started.
+
 ## 2026-11-23 16:06 (Cairo) - Phase 3 (spec) draft written, awaiting Ahmed's answers
 
 - Ahmed clarified the "official result" sentence: the printed yearly prayer timetable distributed to the public. The app must replace it so he never needs the paper. Result: a "Year timetable" screen (every day: Gregorian date, Hijri date, six times, offline) is part of the spec. The earlier "official data record" interpretation stays as the internal correction source.
