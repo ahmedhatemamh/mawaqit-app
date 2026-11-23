@@ -31,7 +31,9 @@ Read STATUS.md first in every session.
 - Request with plain `@coderabbitai review` only, and only when all checks are green and the PR is complete.
 - Fix all its comments in one batch, minimal change, pattern applied across the diff.
 - Do not resolve threads or write "Fixed" before its new review finishes. Never merge with open comments.
+- I fix, I do not close. Resolve a thread myself only when CodeRabbit's new review finished with no comments AND it left that thread open by mistake (Ahmed's order, 2026-11-23). CodeRabbit may auto-resolve threads by itself after a fix; that is not my action.
 - One review per hour, one PR at a time. Log new findings in docs/lessons-learned.md.
+- Subscribe to activity (subscribe_pr_activity) on EVERY PR I open, in any project repo, right after creating it. Not only the first one (Ahmed's order, 2026-11-23).
 
 ## Testing
 - No "done" without a real test run and its result shown: normal, missing data, wrong data, edge values, regression.
