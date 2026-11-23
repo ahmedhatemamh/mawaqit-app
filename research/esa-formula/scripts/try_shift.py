@@ -17,6 +17,8 @@ def run(sh):
     return tot, sh, det
 if __name__ == "__main__":
     print([n for n in names if n not in D])
+    if not any(n in D for n in names):
+        raise SystemExit("input error: no selected city found in the data folder")
     with mp.Pool(4) as p:
         for r in sorted(p.map(run, [x / 2 for x in range(-12, 13)]))[:8]:
             print("misses=%d shift_h=%+.1f per-city=%s" % r)

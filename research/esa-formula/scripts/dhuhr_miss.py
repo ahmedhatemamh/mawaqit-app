@@ -26,6 +26,9 @@ for n, c in D.items():
             rows.append((n, d, t - m))
 print("dhuhr misses:", len(rows))
 dist = [abs(abs(r[2]) - 0.5) * 60 for r in rows]
-print("distance from rounding boundary (s): max %.2f, median %.2f" % (max(dist), sorted(dist)[len(dist)//2]))
+if dist:
+    print("distance from rounding boundary (s): max %.2f, median %.2f" % (max(dist), sorted(dist)[len(dist)//2]))
+else:
+    print("no mismatches")
 print("misses by month:", sorted(collections.Counter(r[1].month for r in rows).items()))
 print("dates with >=3 cities missing:", [(d.isoformat(), k) for d, k in collections.Counter(r[1] for r in rows).most_common(8)])

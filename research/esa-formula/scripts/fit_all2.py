@@ -16,7 +16,7 @@ if __name__ == "__main__":
     D = load(sys.argv[1] + "/esa_year")
     with mp.Pool(4) as p:
         res = p.map(work, sorted(D.items()))
-    json.dump(res, open(sys.argv[1] + "/fit2_%s_%s_%s.json" % (MODEL, RISE, int(DST)), "w"), ensure_ascii=False)
+    json.dump(res, open(sys.argv[1] + "/fit2_%s_%s_%s.json" % (MODEL, RISE, DMODE or "none"), "w"), ensure_ascii=False)
     nd = sum(r[3] for r in res)
     per = [sum(r[4][k] for r in res) for k in range(6)]
     print(MODEL, "rise", RISE, "dst_mode", DMODE, "exact %.3f%%" % (100 * sum(per) / (6 * nd)), "misses", 6 * nd - sum(per),

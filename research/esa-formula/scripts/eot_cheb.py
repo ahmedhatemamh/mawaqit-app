@@ -19,7 +19,7 @@ def feas(ref, delta):
     dist = np.zeros(N)
     for _ in range(N + 1):
         new = dist.copy(); np.minimum.at(new, dst, dist[src] + w)
-        if np.allclose(new, dist, atol=1e-12): return True
+        if np.allclose(new, dist, rtol=0, atol=1e-12): return True
         dist = new
     return False
 def mindelta(ref):

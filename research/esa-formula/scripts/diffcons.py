@@ -22,7 +22,7 @@ def feasible(delta):
     for it in range(N + 1):
         cand = dist[src] + w
         new = dist.copy(); np.minimum.at(new, dst, cand)
-        if np.allclose(new, dist, atol=1e-12):
+        if np.allclose(new, dist, rtol=0, atol=1e-12):
             return True, dist
         dist = new
     return False, dist

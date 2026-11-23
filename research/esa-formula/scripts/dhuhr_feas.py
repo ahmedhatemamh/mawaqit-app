@@ -15,9 +15,13 @@ def best_lon(city, eq):
         c = (12 + tz) * 60 - E; m = e[2]
         ev.append(((c - m - 0.5) / 4, +1)); ev.append(((c - m + 0.5) / 4, -1))
     ev.sort(); cur = best = 0; at = None
-    for x, s in ev:
+    for i, (x, s) in enumerate(ev):
         cur += s
-        if cur > best: best, at = cur, x
+        if cur > best:
+            j = i + 1
+            while j < len(ev) - 1 and ev[j][0] == x:
+                j += 1
+            best, at = cur, (x + ev[j][0]) / 2
     return best, len(city), at
 for model in EQ:
     tot = good = 0; worst = []

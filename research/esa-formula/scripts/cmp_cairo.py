@@ -1,7 +1,7 @@
 import json,glob,math,datetime as dt,re,sys
 S=sys.argv[1]
 def times(y,m,d,lat,lon,tz,fa=19.5,ia=17.5):
-    jd=dt.date(y,m,d).toordinal()-dt.date(2000,1,1).toordinal()+0.5-lon/360
+    jd=dt.date(y,m,d).toordinal()-dt.date(2000,1,1).toordinal()-lon/360
     g=math.radians((357.529+0.98560028*jd)%360); q=(280.459+0.98564736*jd)%360
     L=math.radians((q+1.915*math.sin(g)+0.020*math.sin(2*g))%360); e=math.radians(23.439-0.00000036*jd)
     RA=math.degrees(math.atan2(math.cos(e)*math.sin(L),math.cos(L)))/15%24
