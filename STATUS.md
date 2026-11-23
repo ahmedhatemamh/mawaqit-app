@@ -2,6 +2,13 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 16:01 (Cairo) - Ahmed's answers on N1-N8 recorded in docs/plan.md
+
+- Approved: N1, N3, N5, N6, N8. Changed: N2 (measure formula vs ESA for a full year, correct via the 1/11/21 checks), N4 (Hijri can change only on Hijri days 29, 30, 1, 2, 3), N7 (check whether the ESA vs Dar al-Ifta difference is permanent and in which prayers).
+- Product principles: simple, light, Islamic identity, no user setup; user only chooses widgets and sets reminders (before upcoming prayers or one prayer, fixed or variable offsets, several per prayer).
+- Open: Ahmed's last sentence about an "official result" record with prayer times and an updated Hijri date is interpreted as one official dataset (times + Hijri); awaiting his confirmation.
+- Model note: this edit was made on Sonnet; planning itself was done on Opus earlier. No code started.
+
 ## 2026-11-23 15:40 (Cairo) - Final plan written (Opus), awaiting Ahmed's decision
 
 - Full plan in docs/plan.md: fixed decisions D1-D5, new decisions N1-N8 (recommendations marked), phases 3-13.
