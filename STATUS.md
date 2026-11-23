@@ -2,6 +2,23 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-23 22:07 (Cairo) - دمج PR 1 في المستودعين، ونشر التاريخ الهجري فعليًا، وخطاب المعهد القومي للفلك
+
+قرارات أحمد (ردوده): "ادمج" لـPR 1 في mawaqit-data، "موافق" على طلب إذن المعهد القومي للفلك، "موافق" على فرع `feat/hijri-bayan`، "لما يوصل" (رد المساحة)، "جرب تاني" (حذف الفرع المدموج).
+
+اللي اتعمل:
+- mawaqit-app PR 1 اندمج Squash (06d64e4): كودرابت خلّص آخر مراجعة (e364020) من غير ملاحظات، كل الـ9 threads اتقفلت منه، والحالة clean، والـPR مالمسش STATUS ولا ملفات حراسة.
+- mawaqit-data PR 1 اندمج Squash (e24309b) بأمر أحمد (فيه workflow = ملف حراسة).
+- شغّلت الـworkflow `hijri` يدويًا بعد الدمج (run 45254652730): نجح بكل خطواته، وخطوة "Make sure the served file is current" خدت حوالي دقيقة، وخطوة الـissue اتخطت. تحقق مستقل مني: سحبت `https://data.ahmedhatem.work/hijri.json` فعليًا (HTTP 200) وطابق `docs/hijri.json` في `main` بايت بايت (cmp: IDENTICAL).
+- لقيت إن الـproxy بيمنع data.ahmedhatem.work (403 من الـproxy مش الموقع)، فأضفته للشبكة المسموحة في بيئة Mawaqit بموافقة أحمد على طلب السماح. القايمة دلوقتي: esa.gov.eg وdar-alifta.org وnriag.sci.eg وahram وmaspero وdata.ahmedhatem.work.
+- حذف فرع `research/esa-formula` المدموج في mawaqit-app فشل مرتين: "the remote end hung up unexpectedly" (غالبًا الشبكة بتمنع حذف الفروع). ما التفّيتش حواليه. الفرع مدموج بالكامل ومالوش أثر.
+- كتبت `docs/nriag-letter.md` (مسودة خطاب إذن للمعهد القومي للفلك، من غير بيانات اتصال). سبب الطلب: robots.txt بتاعهم بيمنع زواحف الذكاء الاصطناعي بالاسم ومفيش شروط استخدام واضحة، فلا سحب لحد ما يردوا.
+
+الباقي:
+- فرع `feat/hijri-bayan` (المحلل + تاريخ 133 شهر + متابعة بيانات الإفتاء الجديدة): بعد الخطاب.
+- رد المساحة (أحمد هيبعته لما يوصل)، وبعدها الجزء الخاص بالمساحة.
+- حذف فرع `research/esa-formula` من زرار "Delete branch" لو أحمد حب (اختياري).
+
 ## 2026-11-23 21:29 (Cairo) - PR رقم 1 في mawaqit-app: إصلاح تسمية الجدوى في سكريبتات البحث
 
 - كودرابت راجع commit 104bbe9 وطلع ملاحظة واحدة (Minor) في `diffcons.py`: نتيجة "feasible" كانت بتتقرأ كأنها إثبات للتقريب الدقيق، وهي في الحقيقة فحص على فترات مغلقة (closed-interval relaxation).
