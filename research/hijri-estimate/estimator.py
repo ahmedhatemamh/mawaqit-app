@@ -2,7 +2,7 @@
 
 For one lunation: take the Cairo date of the new moon, then the first evening (that day or the next three) on which the
 Moon is at least MIN_ALTITUDE degrees above the horizon at sunset. The month starts the next day.
-Months are numbered from a known month start (the anchor): the lunation whose new moon falls 0 to 3 days before it.
+Months are numbered from a known month start (the anchor): the lunation whose new moon falls 0 to 4 days before it.
 """
 import datetime as dt
 import math
@@ -45,11 +45,11 @@ def estimated_start(k):
 
 
 def lunation_of_start(start):
-    """Lunation whose new moon falls 0 to 3 days before a known month start."""
+    """Lunation whose new moon falls 0 to 4 days before a known month start (the range estimated_start can produce)."""
     k0 = round((crescent.jd_at(start, 0) - REFERENCE_NEW_MOON_JDE) / SYNODIC_MONTH)
     for k in (k0 - 1, k0, k0 + 1):
         d = cairo_date(new_moon(k))
-        if start - dt.timedelta(days=3) <= d <= start:
+        if start - dt.timedelta(days=4) <= d <= start:
             return k
     raise ValueError("no lunation matches the month start %s" % start)
 

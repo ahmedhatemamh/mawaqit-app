@@ -98,12 +98,12 @@ internal object CrescentEstimator {
         return first.plusDays(4)
     }
 
-    /** The lunation whose new moon falls 0 to 3 days before a known month start. */
+    /** The lunation whose new moon falls 0 to 4 days before a known month start (the range [estimatedStart] can produce). */
     fun lunationOfStart(start: LocalDate): Long {
         val k0 = round((jdAt(start, 0.0) - REFERENCE_NEW_MOON_JDE) / SYNODIC_MONTH).toLong()
         for (k in longArrayOf(k0 - 1, k0, k0 + 1)) {
             val d = cairoDate(newMoon(k))
-            if (!d.isBefore(start.minusDays(3)) && !d.isAfter(start)) return k
+            if (!d.isBefore(start.minusDays(4)) && !d.isAfter(start)) return k
         }
         throw IllegalArgumentException("no lunation matches the month start $start")
     }

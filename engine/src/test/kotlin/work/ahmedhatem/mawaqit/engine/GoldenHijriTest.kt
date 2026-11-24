@@ -60,4 +60,16 @@ class GoldenHijriTest {
         println("official month starts reproduced exactly: $exact of ${months.size}")
         assertTrue("only $exact of ${months.size} reproduced", exact >= 120)
     }
+
+    @Test
+    fun aMonthStartUpToFourDaysAfterTheNewMoonIsMatchedToItsLunation() {
+        val k = 332L
+        val newMoonDate = CrescentEstimator.cairoDate(CrescentEstimator.newMoon(k))
+        for (offset in 0L..4L) {
+            assertEquals("offset $offset", k, CrescentEstimator.lunationOfStart(newMoonDate.plusDays(offset)))
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            CrescentEstimator.lunationOfStart(newMoonDate.plusDays(5))
+        }
+    }
 }

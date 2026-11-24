@@ -1,6 +1,7 @@
 """Accuracy of the estimator against every known month start (Dar al-Ifta), counting from each known month.
 
 Usage: python3 evaluate_direct.py <hijri.json from mawaqit-data>
+A pair (anchor, target) is scored for a horizon only when the target month really is that many months after the anchor.
 """
 import datetime as dt
 import json
@@ -11,14 +12,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import estimator
 
 state = json.load(open(sys.argv[1], encoding="utf-8"))
-months = [(m["year"] * 12 + m["month"] - 1, dt.date.fromisoformat(m["start"])) for m in state["months"]]
-print("known month starts:", len(months))
+starts = {m["year"] * 12 + m["month"] - 1: dt.date.fromisoformat(m["start"]) for m in state["months"]}
+print("known month starts:", len(starts))
 for ahead in (0, 1, 3, 12, 36):
     exact = total = 0
     offsets = {}
-    for i in range(0, len(months) - ahead):
-        idx0, start0 = months[i]
-        idx, truth = months[i + ahead]
+    for idx0, start0 in sorted(starts.items()):
+        idx = idx0 + ahead
+        if idx not in starts:
+            continue
+        truth = starts[idx]
         if ahead == 0:
             est = estimator.estimated_start(estimator.lunation_of_start(start0))
         else:
@@ -28,4 +31,7 @@ for ahead in (0, 1, 3, 12, 36):
         total += 1
         exact += off == 0
     label = "the month itself (anchor used only to number the lunation)" if ahead == 0 else "%d months after the anchor" % ahead
+    if total == 0:
+        print("%-58s no comparisons (not enough months)" % label)
+        continue
     print("%-58s exact %d/%d (%.1f%%) offsets %s" % (label, exact, total, 100.0 * exact / total, dict(sorted(offsets.items()))))

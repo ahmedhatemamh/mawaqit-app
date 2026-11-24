@@ -109,27 +109,67 @@ class HijriCalendarTest {
         assertThrows(IllegalArgumentException::class.java) { calendar.startOfMonth(1448, 13) }
     }
 
-    @Test
-    fun anEstimateOf31DaysIsLimitedTo30() {
-        val anchor = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))
-        val anchorLunation = CrescentEstimator.lunationOfStart(anchor.start)
-        // The stub makes the month after the anchor start 31 days later, then 30 days apart.
-        val offsets = mapOf(0L to 0L, 1L to 31L, 2L to 61L, 3L to 91L, 4L to 121L, 5L to 151L)
-        val stubbed = HijriCalendar(listOf(anchor)) { k ->
-            anchor.start.plusDays(offsets[k - anchorLunation] ?: error("unexpected lunation $k"))
-        }
-        val first = stubbed.startOfMonth(1448, 7).first
-        assertEquals(LocalDate.of(2026, 11, 11).plusDays(30), first)
-        var date = LocalDate.of(2026, 11, 11)
-        var previous = stubbed.dateOf(date)
-        repeat(100) {
+    private fun assertMonthLengthsAreValid(calendar: HijriCalendar, from: LocalDate, days: Int) {
+        var date = from
+        var previous = calendar.dateOf(date)
+        var boundaries = 0
+        repeat(days) {
             date = date.plusDays(1)
-            val h = stubbed.dateOf(date)
-            if (h.day == 1) assertTrue("month ended after ${previous.day} days", previous.day in 29..30)
-            else assertEquals(previous.day + 1, h.day)
-            assertTrue(h.day in 1..30)
+            val h = calendar.dateOf(date)
+            assertTrue("$date -> $h", h.day in 1..30)
+            if (h.day == 1) {
+                assertTrue("$date: month ended after ${previous.day} days", previous.day in 29..30)
+                boundaries++
+            } else {
+                assertEquals("$date", previous.day + 1, h.day)
+            }
             previous = h
         }
+        assertTrue("no month boundary found", boundaries > 0)
+    }
+
+    @Test
+    fun anEstimateOf31DaysIsLimitedTo30EvenFarFromTheOfficialMonths() {
+        val anchor = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))
+        val anchorLunation = CrescentEstimator.lunationOfStart(anchor.start)
+        // A pathological estimator that always says "31 days after the previous month": the calendar must still give
+        // months of 29 or 30 days, including far beyond the first few (this used to fail after about 150 days).
+        val stubbed = HijriCalendar(listOf(anchor)) { k -> anchor.start.plusDays(31 * (k - anchorLunation)) }
+        assertEquals(LocalDate.of(2026, 11, 11).plusDays(30), stubbed.startOfMonth(1448, 7).first)
+        assertMonthLengthsAreValid(stubbed, LocalDate.of(2026, 11, 11), 900)
+    }
+
+    @Test
+    fun anEstimateBetweenTwoOfficialMonthsKeepsBothNeighbouringMonthsValid() {
+        // Official starts for months 3 and 5 of 1445 are 60 days apart; month 4 alone would be 29 days after month 3
+        // by its own estimate (15 October), which leaves 31 days to month 5. Both neighbours must be 29 or 30 days.
+        val m3 = HijriMonthStart(1445, 3, LocalDate.of(2023, 9, 16))
+        val m5 = HijriMonthStart(1445, 5, LocalDate.of(2023, 11, 15))
+        val lunationOfMonth3 = CrescentEstimator.lunationOfStart(m3.start)
+        val gapped = HijriCalendar(listOf(m3, m5)) { k ->
+            // Month 4 is the only estimate that matters; later months only need a plausible start.
+            if (k == lunationOfMonth3 + 1) LocalDate.of(2023, 10, 15) else LocalDate.of(2023, 12, 14)
+        }
+        assertEquals(LocalDate.of(2023, 10, 16), gapped.startOfMonth(1445, 4).first)
+        val lastDayOfMonth4 = gapped.dateOf(LocalDate.of(2023, 11, 14))
+        assertEquals(HijriDate(1445, 4, 30, false), lastDayOfMonth4)
+        assertEquals(HijriDate(1445, 5, 1, true), gapped.dateOf(LocalDate.of(2023, 11, 15)))
+    }
+
+    @Test
+    fun anEstimateThatFitsBothNeighboursIsKept() {
+        val m3 = HijriMonthStart(1445, 3, LocalDate.of(2023, 9, 16))
+        val m5 = HijriMonthStart(1445, 5, LocalDate.of(2023, 11, 15))
+        val gapped = HijriCalendar(listOf(m3, m5)) { LocalDate.of(2023, 10, 16) }
+        assertEquals(LocalDate.of(2023, 10, 16), gapped.startOfMonth(1445, 4).first)
+    }
+
+    @Test
+    fun monthsBeforeTheFirstOfficialMonthAreAlsoKept29Or30DaysLong() {
+        val anchor = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))
+        val anchorLunation = CrescentEstimator.lunationOfStart(anchor.start)
+        val stubbed = HijriCalendar(listOf(anchor)) { k -> anchor.start.minusDays(31 * (anchorLunation - k)) }
+        assertMonthLengthsAreValid(stubbed, LocalDate.of(2024, 1, 1), 700)
     }
 
     @Test
