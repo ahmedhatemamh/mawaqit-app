@@ -4,6 +4,9 @@
     <!-- Only for the daily download of hijri.json from data.ahmedhatem.work (HijriFetcher.HIJRI_URL). -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Only when the user presses "حدد موقعي": one approximate position, used on the phone and never sent anywhere. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".MawaqitApp"
         android:usesCleartextTraffic="false"
