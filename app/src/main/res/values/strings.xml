@@ -9,7 +9,7 @@
     <string name="uncertain_hijri">(تقديري)</string>
     <string name="next_label">القادم</string>
     <string name="in_time">بعد %1$s</string>
-    <string name="makruh_until">وقت المنع حتى %1$s</string>
+    <string name="makruh_until">وقت الكراهة حتى %1$s</string>
     <string name="dst_unconfirmed">غير مؤكد: قاعدة التوقيت الصيفي لهذه السنة لم تُعلن بعد</string>
     <string name="data_age">آخر تحديث للتاريخ الهجري منذ %1$d يومًا</string>
     <string name="place_line">المدينة: %1$s</string>
@@ -19,7 +19,7 @@
     <string name="settings_current_place">الحالية: %1$s</string>
     <string name="settings_pick_city">اختر مدينة</string>
     <string name="settings_use_location">حدد موقعي</string>
-    <string name="settings_makruh">وقت المنع بعد الشروق</string>
+    <string name="settings_makruh">وقت الكراهة بعد الشروق</string>
     <string name="settings_makruh_choice">%1$d دقيقة</string>
     <string name="city_picker_title">اختر مدينتك</string>
     <string name="city_picker_search">ابحث عن مدينة</string>

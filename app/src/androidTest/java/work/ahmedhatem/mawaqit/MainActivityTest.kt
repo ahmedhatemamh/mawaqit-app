@@ -58,7 +58,7 @@ class MainActivityTest {
         rule.onNodeWithTag("hijri").assertIsDisplayed()
         rule.onNodeWithTag("next").assertIsDisplayed()
         rule.onNodeWithTag("countdown").assertTextContains("بعد", substring = true)
-        rule.onNodeWithTag("makruh").performScrollTo().assertTextContains("وقت المنع حتى", substring = true)
+        rule.onNodeWithTag("makruh").performScrollTo().assertTextContains("وقت الكراهة حتى", substring = true)
         rule.onNodeWithTag("place").performScrollTo().assertTextContains("القاهرة", substring = true)
     }
 
