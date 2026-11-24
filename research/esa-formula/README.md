@@ -31,8 +31,8 @@
 
 ## بيانات محرك التطبيق (Kotlin)
 
-محرك الحساب في `engine/` بيتولد جدول الشمس والمدن والإجابات المرجعية من كود البحث بسكريبت واحد، عشان مفيش نقل بإيد:
+محرك الحساب في `engine/` بيتولد جدول الشمس والمدن والإجابات المرجعية من كود البحث بسكريبت واحد، عشان مفيش نقل بإيد. الأمر بيتشغّل من جذر المستودع (`mawaqit-app/`) وكل المسارات فيه نسبية له:
 
-    python3 -I scripts/gen_engine_data.py <fit2_vsop_0.845_eqt_all.json> engine/src/main/kotlin/work/ahmedhatem/mawaqit/engine engine/src/test/resources
+    python3 -I research/esa-formula/scripts/gen_engine_data.py <fit2_vsop_0.845_eqt_all.json> engine/src/main/kotlin/work/ahmedhatem/mawaqit/engine engine/src/test/resources
 
 الملف الأول ناتج `fit_all2.py vsop 0.845 eqt_all` (إحداثيات المدن بدقة 6 أرقام عشرية). الملف المرجعي `golden_times.csv.gz` فيه قيمنا إحنا بس، مش بيانات المساحة. المقارنة بجداول المساحة محلية: `MAWAQIT_ESA_CSV=<ملف> ./gradlew :engine:test` (بتتخطى لو المتغير مش موجود).
