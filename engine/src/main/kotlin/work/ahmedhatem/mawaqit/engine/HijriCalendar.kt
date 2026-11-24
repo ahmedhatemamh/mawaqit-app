@@ -157,5 +157,8 @@ class HijriCalendar internal constructor(
     companion object {
         /** The calendar with the official months known when this version of the app was built. */
         fun bundled(): HijriCalendar = HijriCalendar(BundledHijriMonths.all)
+
+        /** The official month starts bundled with this version of the app: the fallback when no synced file exists. */
+        fun bundledMonths(): List<HijriMonthStart> = BundledHijriMonths.all
     }
 }
