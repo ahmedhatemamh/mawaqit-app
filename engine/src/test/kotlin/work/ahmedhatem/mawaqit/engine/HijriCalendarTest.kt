@@ -14,6 +14,14 @@ class HijriCalendarTest {
     private fun hijri(y: Int, m: Int, d: Int) = calendar.dateOf(LocalDate.of(y, m, d))
 
     @Test
+    fun bundledMonthsAreTheOnesTheBundledCalendarIsBuiltFrom() {
+        val months = HijriCalendar.bundledMonths()
+        assertEquals(133, months.size)
+        assertEquals(LocalDate.of(2026, 11, 11), months.last().start)
+        assertEquals(calendar.dateOf(LocalDate.of(2026, 11, 23)), HijriCalendar(months).dateOf(LocalDate.of(2026, 11, 23)))
+    }
+
+    @Test
     fun knownOfficialDates() {
         // The Dar al-Ifta page showed 13 Jumada al-Akhirah 1448 on 23 November 2026.
         assertEquals(HijriDate(1448, 6, 13, true), hijri(2026, 11, 23))

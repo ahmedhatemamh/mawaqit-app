@@ -18,9 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import work.ahmedhatem.mawaqit.engine.Prayer
+import work.ahmedhatem.mawaqit.hijri.HijriSyncWorker
 import work.ahmedhatem.mawaqit.ui.MawaqitTheme
 
 class MainActivity : ComponentActivity() {
+    override fun onStart() {
+        super.onStart()
+        HijriSyncWorker.syncIfStale(applicationContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
