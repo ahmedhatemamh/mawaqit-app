@@ -4,6 +4,7 @@
     <string name="today_title">مواقيت اليوم</string>
 
     <string name="tab_today">اليوم</string>
+    <string name="tab_year">السنة</string>
     <string name="tab_settings">الإعدادات</string>
 
     <string name="uncertain_hijri">(تقديري)</string>
@@ -33,4 +34,11 @@
     <string name="location_outside">موقعك خارج مصر، والمواقيت هنا لمدن مصر فقط. اختر مدينة من القائمة.</string>
     <string name="location_privacy">التطبيق لا يرسل إحداثيات موقعك إلى أي جهة.</string>
     <string name="save_failed">تعذّر حفظ اختيارك لأن مساحة التخزين لا تسمح الآن. حاول مرة أخرى.</string>
+
+    <string name="year_prev_month">الشهر السابق</string>
+    <string name="year_next_month">الشهر التالي</string>
+    <string name="year_prev_year">السنة السابقة</string>
+    <string name="year_next_year">السنة التالية</string>
+    <string name="year_today">هذا الشهر</string>
+    <string name="year_dst_unconfirmed">غير مؤكد: قاعدة التوقيت الصيفي لهذه السنة لم تُعلن بعد</string>
 </resources>
