@@ -249,14 +249,22 @@ class HijriSyncTest {
     }
 
     @Test
-    fun appOpenWorkSkipsOnlyOnItsFirstRunWhenTheLastAttemptIsRecent() {
+    fun appOpenWorkSkipsWhenTheLastAttemptIsRecentAndTheDailyWorkNever() {
         val fresh = HijriSyncState(null, 0, 1000)
         val now = 1000 + HijriSync.DAY_MILLIS - 1
-        assertTrue(HijriSyncWorker.shouldSkip(true, 0, fresh, now))
-        assertFalse(HijriSyncWorker.shouldSkip(true, 1, fresh, now))                      // a retry goes on
-        assertFalse(HijriSyncWorker.shouldSkip(false, 0, fresh, now))                     // the daily work never skips
-        assertFalse(HijriSyncWorker.shouldSkip(true, 0, fresh, 1000 + HijriSync.DAY_MILLIS))  // due
-        assertFalse(HijriSyncWorker.shouldSkip(true, 0, HijriSyncState(null, null, null), now))  // never tried
+        assertTrue(HijriSyncWorker.shouldSkip(true, fresh, now))
+        assertFalse(HijriSyncWorker.shouldSkip(false, fresh, now))                       // the daily work never skips
+        assertFalse(HijriSyncWorker.shouldSkip(true, fresh, 1000 + HijriSync.DAY_MILLIS))  // due
+        assertFalse(HijriSyncWorker.shouldSkip(true, HijriSyncState(null, null, null), now))  // never tried
+    }
+
+    @Test
+    fun onlyTheDailyWorkRetriesAFailedAttempt() {
+        val success = androidx.work.ListenableWorker.Result.success()
+        for (failure in listOf(SyncOutcome.NetworkError("x"), SyncOutcome.StorageError("x"))) {
+            assertEquals(success, HijriSyncWorker.resultOf(failure, 0, fromAppOpen = true))
+            assertEquals(androidx.work.ListenableWorker.Result.retry(), HijriSyncWorker.resultOf(failure, 0, fromAppOpen = false))
+        }
     }
 
     @Test

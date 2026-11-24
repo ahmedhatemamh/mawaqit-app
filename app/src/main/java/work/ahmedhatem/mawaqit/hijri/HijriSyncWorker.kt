@@ -21,8 +21,9 @@ class HijriSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
         val store = store(applicationContext)
         val now = System.currentTimeMillis()
         // Work started when the app was opened checks here (off the main thread) whether a sync is due at all.
-        if (shouldSkip(inputData.getBoolean(ONLY_IF_STALE, false), runAttemptCount, store.state(), now)) return Result.success()
-        return resultOf(HijriSync(store, HijriFetcher()).run(now), runAttemptCount)
+        val fromAppOpen = inputData.getBoolean(ONLY_IF_STALE, false)
+        if (shouldSkip(fromAppOpen, store.state(), now)) return Result.success()
+        return resultOf(HijriSync(store, HijriFetcher()).run(now), runAttemptCount, fromAppOpen)
     }
 
     companion object {
@@ -33,17 +34,20 @@ class HijriSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
 
         fun store(context: Context) = HijriStore(File(context.filesDir, "hijri"))
 
-        /**
-         * Work queued by an app start skips when the last attempt is recent. Only the first run decides: a retry of an
-         * attempt that failed must go on, even though that attempt was recorded.
-         */
-        internal fun shouldSkip(onlyIfStale: Boolean, runAttempt: Int, state: HijriSyncState, nowMillis: Long): Boolean =
-            onlyIfStale && runAttempt == 0 && !HijriSync.isStale(state, nowMillis)
+        /** Work queued by an app start skips when the last attempt (any outcome) is less than a day old. */
+        internal fun shouldSkip(fromAppOpen: Boolean, state: HijriSyncState, nowMillis: Long): Boolean =
+            fromAppOpen && !HijriSync.isStale(state, nowMillis)
 
-        internal fun resultOf(outcome: SyncOutcome, attempt: Int): Result = when (outcome) {
+        /**
+         * A failed attempt is retried (with backoff, up to [MAX_ATTEMPTS] runs) only by the daily work. The work queued
+         * by an app start does not retry: its attempt is recorded, so a retry would find the data "recent" anyway, and
+         * the daily work looks again by itself.
+         */
+        internal fun resultOf(outcome: SyncOutcome, attempt: Int, fromAppOpen: Boolean = false): Result = when (outcome) {
             SyncOutcome.Updated, SyncOutcome.NotModified, is SyncOutcome.Rejected -> Result.success()
             is SyncOutcome.NetworkError, is SyncOutcome.StorageError ->
-                if (attempt + 1 < MAX_ATTEMPTS) Result.retry() else Result.failure()
+                if (fromAppOpen) Result.success()
+                else if (attempt + 1 < MAX_ATTEMPTS) Result.retry() else Result.failure()
         }
 
         private val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
