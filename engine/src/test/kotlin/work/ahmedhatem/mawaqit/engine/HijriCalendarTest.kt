@@ -173,6 +173,32 @@ class HijriCalendarTest {
     }
 
     @Test
+    fun aVeryLargeGapBetweenOfficialMonthsStillResolvesEveryDate() {
+        // 4000 months of exactly 30 days between 1448-06 and 1781-10: valid, so every month in the gap is 30 days.
+        val a = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))
+        val b = HijriMonthStart(1781, 10, a.start.plusDays(120000))
+        val gapped = HijriCalendar(listOf(a, b)) { a.start }  // the estimate is irrelevant: the bounds leave one answer
+        // 30000 days after a is exactly 1000 months later: the first day of month number a + 1000.
+        assertEquals(HijriDate(1448 + (5 + 1000) / 12, (5 + 1000) % 12 + 1, 1, false), gapped.dateOf(a.start.plusDays(30000)))
+        assertEquals(HijriDate(1448 + (5 + 1000) / 12, (5 + 1000) % 12 + 1, 30, false), gapped.dateOf(a.start.plusDays(30029)))
+        // and 30000 days before b: 1000 months earlier than b.
+        val index = b.year * 12 + b.month - 1 - 1000
+        assertEquals(HijriDate(index / 12, index % 12 + 1, 1, false), gapped.dateOf(b.start.minusDays(30000)))
+        assertEquals(HijriDate(1781, 10, 1, true), gapped.dateOf(b.start))
+    }
+
+    @Test
+    fun aDateFarBeforeTheFirstOfficialMonthResolves() {
+        val a = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))
+        val lunation = CrescentEstimator.lunationOfStart(a.start)
+        // Every estimated start is 30 days before the next one.
+        val stubbed = HijriCalendar(listOf(a)) { k -> a.start.minusDays(30 * (lunation - k)) }
+        val h = stubbed.dateOf(a.start.minusDays(30 * 600L))
+        assertEquals(HijriDate(1448 - 50, 6, 1, false), h)
+        assertEquals(HijriDate(1448 - 50, 5, 30, false), stubbed.dateOf(a.start.minusDays(30 * 600L + 1)))
+    }
+
+    @Test
     fun badOfficialDataIsRejected() {
         val a = HijriMonthStart(1448, 5, LocalDate.of(2026, 10, 12))
         val b = HijriMonthStart(1448, 6, LocalDate.of(2026, 11, 11))

@@ -45,13 +45,19 @@ def estimated_start(k):
 
 
 def lunation_of_start(start):
-    """Lunation whose new moon falls 0 to 4 days before a known month start (the range estimated_start can produce)."""
+    """Lunation whose new moon falls 0 to 4 days before a known month start (the range estimated_start can produce).
+
+    A start with no such new moon is not a plausible crescent month start; the lunation whose new moon is nearest to two
+    days before it is used instead of failing (same rule as the Kotlin engine).
+    """
     k0 = round((crescent.jd_at(start, 0) - REFERENCE_NEW_MOON_JDE) / SYNODIC_MONTH)
-    for k in (k0 - 1, k0, k0 + 1):
+    candidates = (k0 - 1, k0, k0 + 1)
+    for k in candidates:
         d = cairo_date(new_moon(k))
         if start - dt.timedelta(days=4) <= d <= start:
             return k
-    raise ValueError("no lunation matches the month start %s" % start)
+    target = start - dt.timedelta(days=2)
+    return min(candidates, key=lambda k: abs((cairo_date(new_moon(k)) - target).days))
 
 
 def estimate_from_anchor(anchor_start, anchor_index, month_index):

@@ -2,7 +2,6 @@ package work.ahmedhatem.mawaqit.engine
 
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import kotlin.math.roundToInt
 
 /** The official first day of one Hijri month (year, month 1 to 12). */
 data class HijriMonthStart(val year: Int, val month: Int, val start: LocalDate) {
@@ -56,9 +55,6 @@ class HijriCalendar internal constructor(
     /** The official month start nearest to a month number. */
     private fun nearestByIndex(index: Int): HijriMonthStart =
         known.minByOrNull { Math.abs(it.index - index) }!!
-
-    private fun nearestByDate(date: LocalDate): HijriMonthStart =
-        known.minByOrNull { Math.abs(ChronoUnit.DAYS.between(it.start, date)) }!!
 
     private fun rawStart(index: Int): LocalDate = rawStarts.getOrPut(index) {
         val anchor = nearestByIndex(index)
@@ -124,26 +120,41 @@ class HijriCalendar internal constructor(
         return Pair(startOf(index), knownByIndex.containsKey(index))
     }
 
+    /**
+     * The number of the last month whose start is not after [date]. Every month lasts 29 or 30 days, so the answer
+     * lies between two numbers that follow from the nearest official start, and month starts only grow with the number:
+     * a binary search between those two always finds it, however far the date is from the official months.
+     */
+    private fun monthIndexOf(date: LocalDate): Int {
+        val first = known.first()
+        var low: Int
+        var high: Int
+        if (date.isBefore(first.start)) {
+            val days = ChronoUnit.DAYS.between(date, first.start)  // at least 1
+            low = first.index - (-Math.floorDiv(-days, 29L)).toInt()  // ceiling of days/29: its start is at most days/29 months before: not after the date
+            high = first.index                                      // an official start, after the date
+        } else {
+            val official = known.last { !it.start.isAfter(date) }
+            val days = ChronoUnit.DAYS.between(official.start, date)
+            low = official.index + (days / 30).toInt()               // 30 days per month at most: not after the date
+            high = official.index + (days / 29).toInt() + 1          // 29 days per month at least: after the date
+            known.firstOrNull { it.index > official.index }?.let { high = minOf(high, it.index) }
+        }
+        while (high - low > 1) {
+            val middle = low + (high - low) / 2
+            if (startOf(middle).isAfter(date)) high = middle else low = middle
+        }
+        return low
+    }
+
     fun dateOf(date: LocalDate): HijriDate {
-        val anchor = nearestByDate(date)
-        var index = anchor.index + (ChronoUnit.DAYS.between(anchor.start, date) / CrescentEstimator.SYNODIC_MONTH).roundToInt()
-        var steps = 0
-        while (startOf(index).isAfter(date)) {
-            index--
-            check(++steps < MAX_STEPS) { "month search did not settle for $date" }
-        }
-        while (!startOf(index + 1).isAfter(date)) {
-            index++
-            check(++steps < MAX_STEPS) { "month search did not settle for $date" }
-        }
+        val index = monthIndexOf(date)
         val day = ChronoUnit.DAYS.between(startOf(index), date).toInt() + 1
         val certain = knownByIndex.containsKey(index) && (knownByIndex.containsKey(index + 1) || day <= 29)
         return HijriDate(Math.floorDiv(index, 12), Math.floorMod(index, 12) + 1, day, certain)
     }
 
     companion object {
-        private const val MAX_STEPS = 12
-
         /** The calendar with the official months known when this version of the app was built. */
         fun bundled(): HijriCalendar = HijriCalendar(BundledHijriMonths.all)
     }

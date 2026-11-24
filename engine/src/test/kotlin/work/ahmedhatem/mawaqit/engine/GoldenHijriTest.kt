@@ -62,14 +62,16 @@ class GoldenHijriTest {
     }
 
     @Test
-    fun aMonthStartUpToFourDaysAfterTheNewMoonIsMatchedToItsLunation() {
+    fun aMonthStartUpToFourDaysAfterTheNewMoonIsMatchedToItsLunationAndOddStartsNeverFail() {
         val k = 332L
         val newMoonDate = CrescentEstimator.cairoDate(CrescentEstimator.newMoon(k))
         for (offset in 0L..4L) {
             assertEquals("offset $offset", k, CrescentEstimator.lunationOfStart(newMoonDate.plusDays(offset)))
         }
-        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
-            CrescentEstimator.lunationOfStart(newMoonDate.plusDays(5))
-        }
+        // Not a plausible crescent month start (5 days after the new moon): the nearest lunation is used, no failure.
+        assertEquals(k, CrescentEstimator.lunationOfStart(newMoonDate.plusDays(5)))
+        // A start between two lunations, far from both, still gives one of them.
+        val between = CrescentEstimator.lunationOfStart(newMoonDate.plusDays(14))
+        assertTrue(between == k || between == k + 1)
     }
 }
