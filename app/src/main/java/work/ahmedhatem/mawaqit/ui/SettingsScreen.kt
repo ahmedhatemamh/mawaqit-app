@@ -38,6 +38,16 @@ import work.ahmedhatem.mawaqit.settings.SaveResult
 import work.ahmedhatem.mawaqit.settings.Settings
 import work.ahmedhatem.mawaqit.settings.SettingsStore
 
+/**
+ * The message to show after a save: the failure message appears when the write fails and goes away when a later save
+ * works. Any other message (a location result) is left alone.
+ */
+internal fun messageAfterSave(result: SaveResult, current: Int?): Int? = when (result) {
+    SaveResult.STORAGE_FAILED -> R.string.save_failed
+    SaveResult.SAVED -> if (current == R.string.save_failed) null else current
+    SaveResult.INVALID -> current
+}
+
 /** The place and the duration of the forbidden period after sunrise. Every choice is saved at once. */
 @Composable
 fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier = Modifier) {
@@ -110,10 +120,7 @@ fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier 
                         selected = settings.makruhMinutes == minutes,
                         role = Role.RadioButton,
                         onClick = {
-                            scope.launch {
-                                val result = store.chooseMakruhMinutes(minutes)
-                                if (result == SaveResult.STORAGE_FAILED) message = R.string.save_failed
-                            }
+                            scope.launch { message = messageAfterSave(store.chooseMakruhMinutes(minutes), message) }
                         },
                     )
                     .testTag("makruh_$minutes"),
@@ -131,9 +138,7 @@ fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier 
                 cancelRequest()
                 message = null
                 picking = false
-                scope.launch {
-                    if (store.chooseCity(name) == SaveResult.STORAGE_FAILED) message = R.string.save_failed
-                }
+                scope.launch { message = messageAfterSave(store.chooseCity(name), message) }
             },
             onDismiss = { picking = false },
         )
