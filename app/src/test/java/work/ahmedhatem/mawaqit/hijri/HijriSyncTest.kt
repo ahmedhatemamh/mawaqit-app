@@ -162,14 +162,14 @@ class HijriSyncTest {
     }
 
     @Test
-    fun serverErrorsAndRedirectsAreNetworkErrorsThatChangeNothing() {
+    fun serverErrorsAndRedirectsAreNetworkErrorsThatOnlyRecordTheAttempt() {
         for (code in listOf(404, 429, 500, 503, 301, 302, 204, 401)) {
             handler = { _, out ->
                 status(out, code, if (code in 300..399) "Location: http://127.0.0.1:1/x\r\n" else "", 0)
             }
-            assertTrue("$code", sync().run(1) is SyncOutcome.NetworkError)
+            assertTrue("$code", sync().run(7) is SyncOutcome.NetworkError)
         }
-        assertEquals(HijriSyncState(null, null, null), store.state())
+        assertEquals(HijriSyncState(null, null, 7), store.state())   // no success, no ETag, no new data
         assertEquals(HijriCalendar.bundledMonths(), store.loadMonths())
     }
 
@@ -183,7 +183,19 @@ class HijriSyncTest {
         server.stop()
         val gone = HijriSync(store, HijriFetcher(URL("http://127.0.0.1:$port/hijri.json"), 1000))
         assertTrue(gone.run(1) is SyncOutcome.NetworkError)
-        assertEquals(HijriSyncState(null, null, null), store.state())
+        assertEquals(HijriSyncState(null, null, 1), store.state())
+    }
+
+    @Test
+    fun aFailingStoreGivesAStorageErrorNotAnException() {
+        // a non-empty directory sits where the state file goes, so every write of it fails
+        File(folder.root, "hijri/hijri-meta.json").apply { mkdirs(); File(this, "x").writeText("x") }
+        handler = reply(200, hijriJson(bundledPlusOne()), "\"v1\"")
+        assertTrue(sync().run(1) is SyncOutcome.StorageError)         // new file: state write fails
+        handler = reply(200, "garbage")
+        assertTrue(sync().run(1) is SyncOutcome.StorageError)         // refused file: attempt write fails
+        handler = reply(500)
+        assertTrue(sync().run(1) is SyncOutcome.StorageError)         // network error: attempt write fails
     }
 
     @Test
@@ -203,6 +215,8 @@ class HijriSyncTest {
         assertEquals(androidx.work.ListenableWorker.Result.success(), HijriSyncWorker.resultOf(SyncOutcome.Rejected("x"), 0))
         assertEquals(retry, HijriSyncWorker.resultOf(SyncOutcome.NetworkError("x"), 0))
         assertEquals(retry, HijriSyncWorker.resultOf(SyncOutcome.NetworkError("x"), 3))
+        assertEquals(retry, HijriSyncWorker.resultOf(SyncOutcome.StorageError("x"), 0))
+        assertEquals(androidx.work.ListenableWorker.Result.failure(), HijriSyncWorker.resultOf(SyncOutcome.StorageError("x"), 4))
         assertEquals(androidx.work.ListenableWorker.Result.failure(), HijriSyncWorker.resultOf(SyncOutcome.NetworkError("x"), 4))
     }
 }

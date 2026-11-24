@@ -41,6 +41,9 @@ class HijriOnDeviceTest {
     fun androidJsonReadsTheFileAndRejectsBadOnes() {
         assertEquals(HijriCalendar.bundledMonths(), HijriParser.parse(json()))
         assertEquals(133, HijriParser.parse(json(extra = "\"future\":{\"a\":[1,2]}")).size)
+        assertEquals(133, HijriParser.parse(json() + " \n").size)   // trailing whitespace is fine
+        assertThrows(HijriDataException::class.java) { HijriParser.parse(json() + "garbage") }   // Android stops after one value
+        assertThrows(HijriDataException::class.java) { HijriParser.parse(json() + "}") }
         for (bad in listOf("", "garbage", "[]", json(schema = 2), "{\"schema\":1,\"months\":[{\"year\":\"1446\",\"month\":9,\"start\":\"2025-03-01\"}]}",
             "{\"schema\":1,\"months\":[{\"year\":1446.5,\"month\":9,\"start\":\"2025-03-01\"}]}",
             "{\"schema\":1,\"months\":[{\"year\":1446,\"month\":9,\"start\":null}]}")) {
@@ -62,9 +65,11 @@ class HijriOnDeviceTest {
         val manager = WorkManager.getInstance(context)
         manager.cancelUniqueWork("hijri-sync-daily").result.get()
         HijriSyncWorker.scheduleDaily(context)
-        HijriSyncWorker.scheduleDaily(context)   // a second call keeps the first
+        val firstId = manager.getWorkInfosForUniqueWork("hijri-sync-daily").get().single().id
+        HijriSyncWorker.scheduleDaily(context)   // a second call keeps the first request, not an equal new one
         val infos = manager.getWorkInfosForUniqueWork("hijri-sync-daily").get()
         assertEquals(1, infos.size)
+        assertEquals(firstId, infos[0].id)
         assertTrue(infos[0].state == WorkInfo.State.ENQUEUED || infos[0].state == WorkInfo.State.RUNNING)
         assertTrue(infos[0].tags.any { it == HijriSyncWorker::class.java.name })
         assertEquals(NetworkType.CONNECTED, infos[0].constraints.requiredNetworkType)

@@ -1,8 +1,10 @@
 package work.ahmedhatem.mawaqit.hijri
 
 import java.io.File
+import java.io.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -52,22 +54,43 @@ class HijriStoreTest {
     fun notModifiedAndRejectedUpdateOnlyTheirOwnFields() {
         val s = store()
         s.saveFile(hijriJson(), "\"e1\"", 100)
-        s.recordRejected(200)
+        s.recordAttempt(200)
         assertEquals(HijriSyncState("\"e1\"", 100, 200), s.state())
         s.recordNotModified(300)
         assertEquals(HijriSyncState("\"e1\"", 300, 300), s.state())
     }
 
     @Test
-    fun failedWriteLeavesTheOldFileWhole() {
+    fun failedWriteThrowsAndLeavesNoTemporaryFile() {
         val s = store()
-        s.saveFile(hijriJson(), "\"e1\"", 100)
-        // make the temporary file impossible to create: a directory sits where it would go
-        File(folder.root, "hijri/hijri.json.tmp").mkdirs()
-        val failed = runCatching { s.saveFile(hijriJson(bundledPlusOne()), "\"e2\"", 200) }
-        assertTrue(failed.isFailure)
+        // a non-empty directory sits where the file goes, so moving the finished temporary file onto it fails
+        val blocked = File(folder.root, "hijri/hijri.json").apply { mkdirs(); File(this, "x").writeText("x") }
+        assertThrows(IOException::class.java) { s.saveFile(hijriJson(bundledPlusOne()), "\"e2\"", 200) }
         assertEquals(HijriCalendar.bundledMonths(), s.loadMonths())
+        assertEquals(listOf("hijri.json"), File(folder.root, "hijri").list()!!.toList())
+        assertTrue(blocked.isDirectory)
+    }
+
+    @Test
+    fun twoWritesUseTwoTemporaryFiles() {
+        val dir = File(folder.root, "hijri").apply { mkdirs() }
+        val a = File.createTempFile("hijri.json", ".tmp", dir)
+        val b = File.createTempFile("hijri.json", ".tmp", dir)
+        assertTrue(a != b)
+        store().saveFile(hijriJson(), null, 1)   // a leftover of another writer is not touched
+        assertTrue(a.exists() && b.exists())
+    }
+
+    @Test
+    fun etagIsOnlyOfferedWhileItsFileIsValid() {
+        val s = store()
+        s.saveFile(hijriJson(bundledPlusOne()), "\"e1\"", 100)
         assertEquals("\"e1\"", s.state().etag)
+        File(folder.root, "hijri/hijri.json").delete()
+        assertNull(s.state().etag)                       // file lost: download again
+        assertEquals(100L, s.state().lastSuccessMillis)  // the rest of the state stays
+        File(folder.root, "hijri/hijri.json").writeText("garbage")
+        assertNull(s.state().etag)                       // file damaged: download again
     }
 
     @Test

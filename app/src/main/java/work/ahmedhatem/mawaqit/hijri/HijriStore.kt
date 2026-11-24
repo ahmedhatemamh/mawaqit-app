@@ -49,7 +49,8 @@ class HijriStore(private val dir: File) {
         return try {
             val json = JSONObject(String(Files.readAllBytes(meta.toPath()), StandardCharsets.UTF_8))
             HijriSyncState(
-                etag = json.opt("etag") as? String,
+                // An ETag only helps while the file it belongs to is still there and valid: otherwise download again.
+                etag = (json.opt("etag") as? String)?.takeIf { stored() != null },
                 lastSuccessMillis = (json.opt("lastSuccess") as? Number)?.toLong(),
                 lastAttemptMillis = (json.opt("lastAttempt") as? Number)?.toLong(),
             )
@@ -74,8 +75,11 @@ class HijriStore(private val dir: File) {
         writeState(state().copy(lastSuccessMillis = nowMillis, lastAttemptMillis = nowMillis))
     }
 
-    /** The server answered but the file was refused. Nothing else changes, and the ETag of the rejected file is not kept. */
-    fun recordRejected(nowMillis: Long) {
+    /**
+     * An attempt that ended without a new file (a refused file, or the server not answering properly): only the attempt
+     * time changes, so repeated app starts do not try again at once. The ETag of a refused file is not kept.
+     */
+    fun recordAttempt(nowMillis: Long) {
         writeState(state().copy(lastAttemptMillis = nowMillis))
     }
 
@@ -89,11 +93,16 @@ class HijriStore(private val dir: File) {
 
     private fun writeAtomically(target: File, text: String) {
         dir.mkdirs()
-        val temporary = File(dir, target.name + ".tmp")
-        FileOutputStream(temporary).use { out ->
-            out.write(text.toByteArray(StandardCharsets.UTF_8))
-            out.fd.sync()
+        // A new temporary file for every write: two writers at once (daily work and app-open work) never share one.
+        val temporary = File.createTempFile(target.name, ".tmp", dir)
+        try {
+            FileOutputStream(temporary).use { out ->
+                out.write(text.toByteArray(StandardCharsets.UTF_8))
+                out.fd.sync()
+            }
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+        } finally {
+            temporary.delete()  // gone already after a successful move
         }
-        Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
     }
 }

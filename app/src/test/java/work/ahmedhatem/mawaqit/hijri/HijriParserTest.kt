@@ -36,6 +36,17 @@ class HijriParserTest {
     }
 
     @Test
+    fun trailingWhitespaceIsFineOtherTrailingTextIsRefused() {
+        val ok = hijriJson()
+        assertEquals(133, HijriParser.parse(ok + " \n\t\r\n").size)
+        rejected(ok + "garbage")
+        rejected(ok + "}")
+        rejected(ok + "{}")
+        rejected(ok + " 1")
+        rejected("$ok\n[]")
+    }
+
+    @Test
     fun wrongOrMissingSchema() {
         rejected(hijriJson(schema = 2))
         rejected(hijriJson(schema = 0))

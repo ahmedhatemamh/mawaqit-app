@@ -5,6 +5,7 @@ import java.time.format.DateTimeParseException
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.json.JSONTokener
 import work.ahmedhatem.mawaqit.engine.HijriCalendar
 import work.ahmedhatem.mawaqit.engine.HijriMonthStart
 
@@ -23,7 +24,13 @@ object HijriParser {
 
     fun parse(text: String): List<HijriMonthStart> {
         val root = try {
-            JSONObject(text)
+            val tokener = JSONTokener(text)
+            val value = tokener.nextValue() as? JSONObject ?: throw HijriDataException("not a JSON object")
+            // Android's parser stops after the first value: anything but whitespace after it is refused here.
+            while (tokener.more()) {
+                if (!tokener.next().isWhitespace()) throw HijriDataException("unexpected text after the JSON object")
+            }
+            value
         } catch (e: JSONException) {
             throw HijriDataException("not a JSON object: ${e.message}")
         }
