@@ -98,6 +98,42 @@ class ScheduleTest {
     }
 
     @Test
+    fun theWaitIsRealTimeAcrossTheNightSummerTimeStarts() {
+        // 23:00 on 23 April 2026 is 21:00 UTC. The clock then jumps, so the next Fajr (24 April, at UTC+3) is
+        // (Fajr minutes) after 21:00 UTC and not an hour more.
+        val now = Instant.parse("2026-04-23T21:00:00Z")
+        val n = Schedule.next(now, cairo.latitude, cairo.longitude)
+        assertEquals(Prayer.FAJR, n.prayer)
+        assertEquals(LocalDate.of(2026, 4, 24), n.date)
+        assertEquals(n.minute * 60, n.secondsUntil)
+    }
+
+    @Test
+    fun theWaitIsRealTimeAcrossTheNightSummerTimeEndsAndInTheRepeatedHour() {
+        // The clock goes back at the end of 29 October 2026. The next Fajr (30 October, at UTC+2) starts at
+        // 22:00 UTC of the 29th plus its minutes.
+        val firstPass = Instant.parse("2026-10-29T20:30:00Z")       // 23:30 at +3
+        val a = Schedule.next(firstPass, cairo.latitude, cairo.longitude)
+        assertEquals(LocalDate.of(2026, 10, 30), a.date)
+        assertEquals(90 * 60 + a.minute * 60, a.secondsUntil)       // 1h30 until 22:00 UTC
+        val secondPass = Instant.parse("2026-10-29T21:30:00Z")      // 23:30 again, at +2
+        val b = Schedule.next(secondPass, cairo.latitude, cairo.longitude)
+        assertEquals(LocalDate.of(2026, 10, 30), b.date)
+        assertEquals(30 * 60 + b.minute * 60, b.secondsUntil)        // 30 minutes until 22:00 UTC
+        assertEquals(60 * 60, a.secondsUntil - b.secondsUntil)      // the two passes are exactly one hour apart
+    }
+
+    @Test
+    fun theWaitIsRealTimeOnAnOrdinaryDayAtAnySecond() {
+        val day = LocalDate.of(2026, 11, 25)
+        val fajr = times(day.plusDays(1))[Prayer.FAJR]
+        val now = Instant.parse("2026-11-25T18:00:30Z")             // 20:00:30 in Cairo, after Isha
+        val n = Schedule.next(now, cairo.latitude, cairo.longitude)
+        val expected = (24 * 3600 - (20 * 3600 + 30)) + fajr * 60
+        assertEquals(expected, n.secondsUntil)
+    }
+
+    @Test
     fun nearestCity() {
         assertEquals("القاهرة", CityFinder.nearest(cairo.latitude + 0.001, cairo.longitude).name)
         val aswan = CityFinder.byName("أسوان")!!

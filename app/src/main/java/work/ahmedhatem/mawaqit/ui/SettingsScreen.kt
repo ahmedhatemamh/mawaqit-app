@@ -34,6 +34,7 @@ import work.ahmedhatem.mawaqit.R
 import work.ahmedhatem.mawaqit.location.LocationFinder
 import work.ahmedhatem.mawaqit.location.LocationResult
 import work.ahmedhatem.mawaqit.settings.Place
+import work.ahmedhatem.mawaqit.settings.SaveResult
 import work.ahmedhatem.mawaqit.settings.Settings
 import work.ahmedhatem.mawaqit.settings.SettingsStore
 
@@ -46,19 +47,26 @@ fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier 
     var picking by rememberSaveable { mutableStateOf(false) }
     var message by rememberSaveable { mutableStateOf<Int?>(null) }
     var messageArg by rememberSaveable { mutableStateOf("") }
+    // The request that is still wanted. Choosing a city, or asking again, cancels it, so a late answer never
+    // replaces a newer choice.
+    var cancelRequest by remember { mutableStateOf({}) }
+
+    fun saved(result: SaveResult, okMessage: Int, okArg: String = "") {
+        when (result) {
+            SaveResult.SAVED -> { message = okMessage; messageArg = okArg }
+            SaveResult.INVALID -> message = R.string.location_outside
+            SaveResult.STORAGE_FAILED -> message = R.string.save_failed
+        }
+    }
 
     fun locate() {
-        finder.find { result ->
+        cancelRequest()
+        cancelRequest = finder.find { result ->
             scope.launch {
                 when (result) {
                     is LocationResult.Found -> {
                         val place = Place.ofPoint(result.latitude, result.longitude)
-                        if (place != null && store.choosePoint(result.latitude, result.longitude)) {
-                            message = R.string.location_done
-                            messageArg = place.label
-                        } else {
-                            message = R.string.location_outside
-                        }
+                        saved(store.choosePoint(result.latitude, result.longitude), R.string.location_done, place?.label.orEmpty())
                     }
                     LocationResult.Off -> message = R.string.location_off
                     LocationResult.Unavailable -> message = R.string.location_unavailable
@@ -101,7 +109,12 @@ fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier 
                     .selectable(
                         selected = settings.makruhMinutes == minutes,
                         role = Role.RadioButton,
-                        onClick = { scope.launch { store.chooseMakruhMinutes(minutes) } },
+                        onClick = {
+                            scope.launch {
+                                val result = store.chooseMakruhMinutes(minutes)
+                                if (result == SaveResult.STORAGE_FAILED) message = R.string.save_failed
+                            }
+                        },
                     )
                     .testTag("makruh_$minutes"),
                 verticalAlignment = Alignment.CenterVertically,
@@ -115,9 +128,12 @@ fun SettingsScreen(settings: Settings, store: SettingsStore, modifier: Modifier 
     if (picking) {
         CityPicker(
             onPick = { name ->
-                scope.launch { store.chooseCity(name) }
+                cancelRequest()
                 message = null
                 picking = false
+                scope.launch {
+                    if (store.chooseCity(name) == SaveResult.STORAGE_FAILED) message = R.string.save_failed
+                }
             },
             onDismiss = { picking = false },
         )

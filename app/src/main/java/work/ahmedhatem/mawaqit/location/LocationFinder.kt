@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.os.CancellationSignal
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 
@@ -30,16 +31,20 @@ class LocationFinder(private val context: Context) {
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
 
+    /**
+     * Asks for the position; [onResult] is called once on the main thread, unless the returned function is called
+     * first: it cancels the request and [onResult] is then never called.
+     */
     @SuppressLint("MissingPermission")
-    fun find(onResult: (LocationResult) -> Unit) {
+    fun find(onResult: (LocationResult) -> Unit): () -> Unit {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (!hasPermission()) {
             onResult(LocationResult.Unavailable)
-            return
+            return {}
         }
         if (!LocationManagerCompat.isLocationEnabled(manager) || !manager.isProviderEnabled(PROVIDER)) {
             onResult(LocationResult.Off)
-            return
+            return {}
         }
         val handler = Handler(Looper.getMainLooper())
         val cancel = CancellationSignal()
@@ -48,17 +53,30 @@ class LocationFinder(private val context: Context) {
             if (done) return
             done = true
             handler.removeCallbacksAndMessages(null)
-            val last = location ?: runCatching { manager.getLastKnownLocation(PROVIDER) }.getOrNull()
-            onResult(if (last == null) LocationResult.Unavailable else LocationResult.Found(last.latitude, last.longitude))
+            // The phone's saved position may be hours old and from another city: only a recent one is used.
+            val saved = runCatching { manager.getLastKnownLocation(PROVIDER) }.getOrNull()
+                ?.takeIf { isRecent(SystemClock.elapsedRealtimeNanos() - it.elapsedRealtimeNanos) }
+            val chosen = location ?: saved
+            onResult(if (chosen == null) LocationResult.Unavailable else LocationResult.Found(chosen.latitude, chosen.longitude))
         }
         handler.postDelayed({ cancel.cancel(); finish(null) }, TIMEOUT_MILLIS)
         LocationManagerCompat.getCurrentLocation(manager, PROVIDER, cancel, ContextCompat.getMainExecutor(context)) {
             finish(it)
         }
+        return {
+            done = true
+            handler.removeCallbacksAndMessages(null)
+            cancel.cancel()
+        }
     }
 
-    private companion object {
-        const val PROVIDER = LocationManager.NETWORK_PROVIDER
-        const val TIMEOUT_MILLIS = 15_000L
+    companion object {
+        private const val PROVIDER = LocationManager.NETWORK_PROVIDER
+        private const val TIMEOUT_MILLIS = 15_000L
+        /** A saved position older than this is not used as "where I am now". */
+        const val MAX_SAVED_AGE_MILLIS = 10 * 60 * 1000L
+
+        /** Whether a saved position of this age (in nanoseconds since it was taken) may be used. */
+        fun isRecent(ageNanos: Long): Boolean = ageNanos in 0..MAX_SAVED_AGE_MILLIS * 1_000_000L
     }
 }

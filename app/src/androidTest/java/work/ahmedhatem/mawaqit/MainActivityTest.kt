@@ -54,10 +54,11 @@ class MainActivityTest {
         waitForToday()
         rule.onNodeWithText("مواقيت اليوم").assertIsDisplayed()
         for (prayer in Prayer.entries) rule.onNodeWithTag("row_${prayer.name}").performScrollTo().assertIsDisplayed()
-        rule.onNodeWithTag("gregorian").assertIsDisplayed()
-        rule.onNodeWithTag("hijri").assertIsDisplayed()
-        rule.onNodeWithTag("next").assertIsDisplayed()
-        rule.onNodeWithTag("countdown").assertTextContains("بعد", substring = true)
+        // the last row was scrolled to above, so each node is brought into view before it is checked
+        rule.onNodeWithTag("gregorian").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("hijri").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("next").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("countdown").performScrollTo().assertTextContains("بعد", substring = true)
         rule.onNodeWithTag("makruh").performScrollTo().assertTextContains("وقت الكراهة حتى", substring = true)
         rule.onNodeWithTag("place").performScrollTo().assertTextContains("القاهرة", substring = true)
     }

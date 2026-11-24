@@ -31,5 +31,6 @@
     <string name="location_off">خدمة الموقع مغلقة في الهاتف. شغّلها أو اختر مدينتك من القائمة.</string>
     <string name="location_unavailable">تعذّر تحديد موقعك الآن. حاول مرة أخرى أو اختر مدينة.</string>
     <string name="location_outside">موقعك خارج مصر، والمواقيت هنا لمدن مصر فقط. اختر مدينة من القائمة.</string>
-    <string name="location_privacy">الموقع يُستخدم على هاتفك فقط ولا يُرسل إلى أي جهة.</string>
+    <string name="location_privacy">التطبيق لا يرسل إحداثيات موقعك إلى أي جهة.</string>
+    <string name="save_failed">تعذّر حفظ اختيارك لأن مساحة التخزين لا تسمح الآن. حاول مرة أخرى.</string>
 </resources>
