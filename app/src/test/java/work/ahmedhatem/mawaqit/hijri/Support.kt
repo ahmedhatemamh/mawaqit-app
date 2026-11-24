@@ -16,11 +16,15 @@ fun hijriJson(months: List<HijriMonthStart> = HijriCalendar.bundledMonths(), sch
         .put("latest", JSONObject().put("date", "2026-11-23")).toString()
 }
 
-/** The bundled months plus one more official month right after the last one (30 days later). */
-fun bundledPlusOne(): List<HijriMonthStart> {
-    val all = HijriCalendar.bundledMonths()
-    val last = all.last()
-    val next = if (last.month == 12) HijriMonthStart(last.year + 1, 1, last.start.plusDays(30))
-    else HijriMonthStart(last.year, last.month + 1, last.start.plusDays(30))
-    return all + next
+/** The bundled months plus [extra] more official months after the last one (30 days each). */
+fun bundledPlus(extra: Int): List<HijriMonthStart> {
+    val months = HijriCalendar.bundledMonths().toMutableList()
+    repeat(extra) {
+        val last = months.last()
+        months += if (last.month == 12) HijriMonthStart(last.year + 1, 1, last.start.plusDays(30))
+        else HijriMonthStart(last.year, last.month + 1, last.start.plusDays(30))
+    }
+    return months
 }
+
+fun bundledPlusOne(): List<HijriMonthStart> = bundledPlus(1)

@@ -25,6 +25,13 @@ class HijriStore(private val dir: File) {
     private val data = File(dir, "hijri.json")
     private val meta = File(dir, "hijri-meta.json")
 
+    /**
+     * Runs [block] while no other sync in this process is changing the stored files. The daily work and the app-open
+     * work have different names, so WorkManager may run them at the same time: whatever reads the stored months and then
+     * writes must do both inside one call, or a slower run could overwrite a newer file with an older one.
+     */
+    fun <T> locked(block: () -> T): T = synchronized(LOCK, block)
+
     /** The month starts to use now: the stored file if it is valid, otherwise the bundled ones. */
     fun loadMonths(): List<HijriMonthStart> = stored() ?: HijriCalendar.bundledMonths()
 
@@ -65,13 +72,13 @@ class HijriStore(private val dir: File) {
      * Keeps a validated file. The meta file is written after the data file, so if the process dies in between, the
      * ETag is older than the data and the next check simply downloads once more.
      */
-    fun saveFile(text: String, etag: String?, nowMillis: Long) {
+    fun saveFile(text: String, etag: String?, nowMillis: Long) = locked {
         writeAtomically(data, text)
         writeState(HijriSyncState(etag, nowMillis, nowMillis))
     }
 
     /** The server answered "not modified". Its ETag stays; the check counts as a success. */
-    fun recordNotModified(nowMillis: Long) {
+    fun recordNotModified(nowMillis: Long) = locked {
         writeState(state().copy(lastSuccessMillis = nowMillis, lastAttemptMillis = nowMillis))
     }
 
@@ -79,7 +86,7 @@ class HijriStore(private val dir: File) {
      * An attempt that ended without a new file (a refused file, or the server not answering properly): only the attempt
      * time changes, so repeated app starts do not try again at once. The ETag of a refused file is not kept.
      */
-    fun recordAttempt(nowMillis: Long) {
+    fun recordAttempt(nowMillis: Long) = locked {
         writeState(state().copy(lastAttemptMillis = nowMillis))
     }
 
@@ -104,5 +111,9 @@ class HijriStore(private val dir: File) {
         } finally {
             temporary.delete()  // gone already after a successful move
         }
+    }
+
+    private companion object {
+        val LOCK = Any()
     }
 }

@@ -21,7 +21,7 @@ class HijriSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
         val store = store(applicationContext)
         val now = System.currentTimeMillis()
         // Work started when the app was opened checks here (off the main thread) whether a sync is due at all.
-        if (inputData.getBoolean(ONLY_IF_STALE, false) && !HijriSync.isStale(store.state(), now)) return Result.success()
+        if (shouldSkip(inputData.getBoolean(ONLY_IF_STALE, false), runAttemptCount, store.state(), now)) return Result.success()
         return resultOf(HijriSync(store, HijriFetcher()).run(now), runAttemptCount)
     }
 
@@ -32,6 +32,13 @@ class HijriSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
         private const val MAX_ATTEMPTS = 5
 
         fun store(context: Context) = HijriStore(File(context.filesDir, "hijri"))
+
+        /**
+         * Work queued by an app start skips when the last attempt is recent. Only the first run decides: a retry of an
+         * attempt that failed must go on, even though that attempt was recorded.
+         */
+        internal fun shouldSkip(onlyIfStale: Boolean, runAttempt: Int, state: HijriSyncState, nowMillis: Long): Boolean =
+            onlyIfStale && runAttempt == 0 && !HijriSync.isStale(state, nowMillis)
 
         internal fun resultOf(outcome: SyncOutcome, attempt: Int): Result = when (outcome) {
             SyncOutcome.Updated, SyncOutcome.NotModified, is SyncOutcome.Rejected -> Result.success()

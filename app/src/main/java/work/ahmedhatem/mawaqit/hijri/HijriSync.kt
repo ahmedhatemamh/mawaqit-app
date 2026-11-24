@@ -43,8 +43,11 @@ class HijriSync(private val store: HijriStore, private val fetcher: HijriFetcher
             }
             is FetchResult.Downloaded -> try {
                 val months = HijriParser.parse(result.text)
-                HijriParser.checkReplaces(store.loadMonths(), months)
-                store.saveFile(result.text, result.etag, nowMillis)
+                // Check against what is stored and save as one step: another sync may have saved a newer file meanwhile.
+                store.locked {
+                    HijriParser.checkReplaces(store.loadMonths(), months)
+                    store.saveFile(result.text, result.etag, nowMillis)
+                }
                 SyncOutcome.Updated
             } catch (e: HijriDataException) {
                 store.recordAttempt(nowMillis)

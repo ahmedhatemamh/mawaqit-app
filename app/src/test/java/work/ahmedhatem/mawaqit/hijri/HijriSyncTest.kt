@@ -199,12 +199,64 @@ class HijriSyncTest {
     }
 
     @Test
+    fun twoSyncsAtOnceNeverLeaveTheOlderFile() {
+        val newer = TinyServer { _, out -> reply(200, hijriJson(bundledPlus(2)), "\"two\"")(emptyMap(), out) }
+        try {
+            repeat(30) { round ->
+                val dir = File(folder.root, "race$round")
+                handler = reply(200, hijriJson(bundledPlus(1)), "\"one\"")
+                val older = HijriSync(HijriStore(dir), HijriFetcher(URL("http://127.0.0.1:${server.port}/hijri.json"), 5000))
+                val latest = HijriSync(HijriStore(dir), HijriFetcher(URL("http://127.0.0.1:${newer.port}/hijri.json"), 5000))
+                val start = java.util.concurrent.CountDownLatch(1)
+                val threads = listOf(older, latest).map { sync ->
+                    Thread { start.await(); sync.run(round.toLong()) }.apply { start() }
+                }
+                start.countDown()
+                threads.forEach { it.join() }
+                assertEquals("round $round", bundledPlus(2), HijriStore(dir).loadMonths())
+            }
+        } finally {
+            newer.stop()
+        }
+    }
+
+    @Test
+    fun lockedBlocksAreNeverRunAtTheSameTime() {
+        val inside = java.util.concurrent.atomic.AtomicInteger()
+        val overlaps = java.util.concurrent.atomic.AtomicInteger()
+        val threads = (1..4).map {
+            Thread {
+                repeat(50) {
+                    HijriStore(File(folder.root, "lock")).locked {
+                        if (inside.incrementAndGet() > 1) overlaps.incrementAndGet()
+                        Thread.yield()
+                        inside.decrementAndGet()
+                    }
+                }
+            }.apply { start() }
+        }
+        threads.forEach { it.join() }
+        assertEquals(0, overlaps.get())
+    }
+
+    @Test
     fun appOpenRuleIsOlderThanADay() {
         val day = HijriSync.DAY_MILLIS
         assertTrue(HijriSync.isStale(HijriSyncState(null, null, null), 5))
         assertFalse(HijriSync.isStale(HijriSyncState(null, 0, 1000), 1000 + day - 1))
         assertTrue(HijriSync.isStale(HijriSyncState(null, 0, 1000), 1000 + day))
         assertTrue(HijriSync.isStale(HijriSyncState(null, 0, 5000), 1000))   // the clock went back
+    }
+
+    @Test
+    fun appOpenWorkSkipsOnlyOnItsFirstRunWhenTheLastAttemptIsRecent() {
+        val fresh = HijriSyncState(null, 0, 1000)
+        val now = 1000 + HijriSync.DAY_MILLIS - 1
+        assertTrue(HijriSyncWorker.shouldSkip(true, 0, fresh, now))
+        assertFalse(HijriSyncWorker.shouldSkip(true, 1, fresh, now))                      // a retry goes on
+        assertFalse(HijriSyncWorker.shouldSkip(false, 0, fresh, now))                     // the daily work never skips
+        assertFalse(HijriSyncWorker.shouldSkip(true, 0, fresh, 1000 + HijriSync.DAY_MILLIS))  // due
+        assertFalse(HijriSyncWorker.shouldSkip(true, 0, HijriSyncState(null, null, null), now))  // never tried
     }
 
     @Test
