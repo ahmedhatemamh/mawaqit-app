@@ -33,6 +33,8 @@ data class Occurrence(
  * phone's job and read this list. A rule with any problem ([AlertRules.problems]) or switched off never fires.
  */
 object AlertPlanner {
+    const val DEFAULT_MAX_DAYS = 14
+
     private val ORDER = listOf(
         AlertTarget.FAJR, AlertTarget.SUNRISE, AlertTarget.DHUHR, AlertTarget.ASR, AlertTarget.MAGHRIB, AlertTarget.ISHA,
     )
@@ -50,7 +52,7 @@ object AlertPlanner {
         longitude: Double,
         makruhMinutes: Int,
         prayed: Set<Pair<LocalDate, Prayer>> = emptySet(),
-        maxDays: Int = 14,
+        maxDays: Int = DEFAULT_MAX_DAYS,
     ): List<Occurrence> {
         require(count > 0 && maxDays > 0)
         val broken = AlertRules.problemsByIndex(rules).map { it.first }.toSet()
@@ -74,6 +76,20 @@ object AlertPlanner {
             }
         }
         return found.sortedWith(compareBy({ it.at }, { it.ruleId }, { it.target })).take(count)
+    }
+
+    /** The next of the six daily times (Fajr to Isha) strictly after [at]: when a shown alert stops being useful. */
+    fun nextDailyTimeAfter(at: Instant, latitude: Double, longitude: Double): Instant {
+        val first = EgyptClock.localDateTime(at).toLocalDate()
+        for (i in 0..1) {
+            val date = first.plusDays(i.toLong())
+            val times = PrayerCalculator.timesFor(date, latitude, longitude)
+            for (t in ORDER) {
+                val instant = EgyptClock.toInstant(date.atStartOfDay().plusMinutes(minuteOf(t, times, 0).toLong()))
+                if (instant > at) return instant
+            }
+        }
+        throw IllegalStateException("No daily time found within two days after $at")
     }
 
     private fun occurrence(
