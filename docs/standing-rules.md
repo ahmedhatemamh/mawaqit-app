@@ -38,3 +38,9 @@
 ## الأسرار والبيانات
 - مفيش كلمات سر أو مفاتيح أو بيانات شخصية في أي commit أو PR أو رد أو طلب خارجي. المستودعات عامة.
 - بيانات الهيئة المصرية العامة للمساحة ما بتتنشرش قبل إذن مكتوب منها.
+
+## الخبراء (قراءة فقط، Sonnet) — قرار أحمد 2026-11-25
+- في `.claude/agents/`: `decision-auditor` و`alarm-reliability-auditor` و`times-hijri-data-auditor` و`android-test-auditor` و`privacy-security-auditor`. كلهم Read وGrep وGlob وSonnet (DEC-034 وDEC-035).
+- الاستدعاء بالقاعدة، مش «الكل على كل PR»: `alarm-reliability-auditor` لأي PR يلمس المنبهات أو الإشعارات أو الصلاحيات؛ `times-hijri-data-auditor` لأي PR يلمس `engine/` أو `hijri/` أو بيانات `mawaqit-data`؛ `android-test-auditor` لـPR فيه اختبار محاكي أو تغيير انتظار أو بعد فشل CI على main؛ `privacy-security-auditor` لأي تغيير في `AndroidManifest.xml` أو workflow أو طلب شبكة وكل المرحلة 12.
+- مراجعة الجدولة الحرجة (أول PR 10ب2 وأي PR بيلمس `AlarmManager`) لازم ليها مراجعة ثانية مستقلة (خبير آخر أو CodeRabbit) قبل الدمج، وأول استدعاء لـ`alarm-reliability-auditor` بيكون **قبل** فتح الـPR.
+- كل استدعاء يتسجل في `docs/agents-log.md` (الهوك بيفكّر أسبوعيًا). مراجعة الجدوى: 2026-12-09 (DEC-036).
