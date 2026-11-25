@@ -30,8 +30,9 @@ class SystemAlarmBackend(private val context: Context) : AlarmBackend {
     }
 
     override fun cancel() {
-        PendingIntent.getBroadcast(context, REQUEST_CODE, baseIntent(), PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
-            ?.let { alarms.cancel(it); it.cancel() }
+        val pending = PendingIntent.getBroadcast(context, REQUEST_CODE, baseIntent(), PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+        Log.i(TAG, "cancel: pending intent " + if (pending != null) "found" else "not found, nothing to cancel")
+        pending?.let { alarms.cancel(it); it.cancel() }
     }
 
     private fun baseIntent() = Intent(context, AlertReceiver::class.java).setAction(ACTION_FIRE)

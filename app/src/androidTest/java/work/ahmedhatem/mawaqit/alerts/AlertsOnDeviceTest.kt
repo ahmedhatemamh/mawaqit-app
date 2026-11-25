@@ -48,6 +48,20 @@ class AlertsOnDeviceTest {
 
     private fun ourAlarmPending() = shell("dumpsys alarm").contains(SystemAlarmBackend.ACTION_FIRE)
 
+    /** For a failure message only: each line of `dumpsys alarm` that names our action, under the heading of its section. */
+    private fun whereOurActionAppears(): String {
+        var heading = "(top of the output)"
+        val found = mutableListOf<String>()
+        for (line in shell("dumpsys alarm").lines()) {
+            if (line.isNotEmpty() && !line[0].isWhitespace()) heading = line.trim()
+            if (line.contains(SystemAlarmBackend.ACTION_FIRE)) found += "[$heading] ${line.trim()}"
+        }
+        return found.joinToString("\n")
+    }
+
+    /** For a failure message only: what cancel() logged (it found the pending intent or not). */
+    private fun cancelLog() = shell("logcat -d -s AlertAlarm:I")
+
     @Test
     fun bothChannelsExistWithTheRightImportance() {
         assertEquals(NotificationManager.IMPORTANCE_DEFAULT, notifications.getNotificationChannel(AlertNotifications.REMINDERS).importance)
@@ -63,7 +77,10 @@ class AlertsOnDeviceTest {
         assertEquals(SystemAlarmBackend.canScheduleExact(context), exact)
         assertTrue("the alarm is pending", ourAlarmPending())
         backend.cancel()
-        assertFalse("the alarm is gone after cancel", ourAlarmPending())
+        assertFalse(
+            "the alarm is gone after cancel. dumpsys sections naming our action:\n${whereOurActionAppears()}\ncancel log:\n${cancelLog()}",
+            ourAlarmPending(),
+        )
     }
 
     @Test
