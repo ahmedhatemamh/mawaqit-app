@@ -1,0 +1,30 @@
+name: decision-link
+
+# Fails a pull request whose description has no "القرار المرتبط:" line (see docs/decisions-log.md and
+# docs/decisions-ci-note.md). It reads the description text only: no checkout, no token permissions, nothing is written.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+jobs:
+  decision-link:
+    # Dependency-bot pull requests have no decision to link.
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require the decision line in the description
+        env:
+          # Passed through the environment, never pasted into the script, so the description cannot run as code.
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -eu
+          body=$(printf '%s' "$PR_BODY" | tr -d '\r')
+          if printf '%s\n' "$body" | grep -Eq '^[[:space:]>*_-]*القرار المرتبط:[[:space:]]*[^[:space:]]'; then
+            echo "Found the decision line."
+            exit 0
+          fi
+          echo "::error title=Missing decision line::The PR description needs a line: القرار المرتبط: DEC-0xx   (or: القرار المرتبط: (لا يوجد: السبب)). Edit the description and this check runs again."
+          exit 1
