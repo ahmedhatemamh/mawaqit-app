@@ -102,6 +102,24 @@ class AlertCodecTest {
     }
 
     @Test
+    fun aRefusedRuleDoesNotTakeAPlaceInTheLimit() {
+        // four alarms before Asr: the first has a repeat the engine refuses, so the three good ones all stay
+        val rules = (1..4).map { AlertRule("r$it", AlertKind.ALARM, setOf(AlertTarget.ASR), -it * 10, repeatEveryMinutes = if (it == 1) 0 else 10) }
+        val back = AlertCodec.decode(AlertCodec.encode(rules))
+        assertEquals(rules.drop(1), back.rules)
+        assertEquals(1, back.skipped)
+    }
+
+    @Test
+    fun aRefusedRuleDoesNotHoldItsIdForALaterGoodRule() {
+        val refused = AlertRule("same", AlertKind.ALARM, setOf(AlertTarget.ASR), -10, repeatEveryMinutes = 0)
+        val good = AlertRule("same", AlertKind.ALARM, setOf(AlertTarget.ASR), -20)
+        val back = AlertCodec.decode(AlertCodec.encode(listOf(refused, good)))
+        assertEquals(listOf(good), back.rules)
+        assertEquals(1, back.skipped)
+    }
+
+    @Test
     fun theFourthAlertBeforeTheSameTimeDoesNotComeBack() {
         val four = (1..4).map { AlertRule("r$it", AlertKind.ALARM, setOf(AlertTarget.ASR), -it * 10) }
         val back = AlertCodec.decode(AlertCodec.encode(four))

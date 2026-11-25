@@ -34,15 +34,20 @@ object AlertCodec {
         } catch (e: JSONException) {
             return DecodedRules(emptyList(), 1)
         }
-        val rules = ArrayList<AlertRule>()
+        val accepted = ArrayList<AlertRule>()
         var skipped = 0
         for (i in 0 until array.length()) {
             val rule = (array.opt(i) as? JSONObject)?.let { decodeRule(it) }
-            if (rule == null) skipped++ else rules += rule
+            if (rule == null) {
+                skipped++
+                continue
+            }
+            // Each rule is checked against the rules already accepted, so a refused rule never takes a place in the
+            // limit of three or holds an id that a later good rule needs.
+            val refused = AlertRules.problemsByIndex(accepted + rule).any { it.first == accepted.size }
+            if (refused) skipped++ else accepted += rule
         }
-        // Whatever was written, only rules the engine accepts come back (a limit, a repeated id, a value out of range).
-        val broken = AlertRules.problemsByIndex(rules).map { it.first }.toSet()
-        return DecodedRules(rules.filterIndexed { i, _ -> i !in broken }, skipped + broken.size)
+        return DecodedRules(accepted, skipped)
     }
 
     fun encodePrayed(prayed: Set<Pair<LocalDate, Prayer>>): String {
