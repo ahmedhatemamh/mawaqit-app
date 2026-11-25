@@ -6,6 +6,8 @@ Newest entry first. Add new entries at the top using Edit only.
 
 **اقرا ده الأول في الجلسة الجديدة.**
 
+التسليم الكامل والخطوات بالترتيب: `docs/handoff-next-session.md`. تجربة تحميل الخبراء في جلسة 2026-11-25 فشلت (`Agent type 'alarm-reliability-auditor' not found`)، فالجلسة الجديدة تتأكد منهم أول حاجة. PR #16 (قاعدة كرت الـPR + DEC-038) مفتوح وفحوصاته خضرا، بانتظار دمج أحمد.
+
 ### وضع 10ب2 (فرع `feat/alerts-scheduling`، آخر commit `20d6a38`، مدفوع، ما فيش PR)
 - **اتكتب** (كله تحت `app/`): `alerts/FiredAlert.kt` (بيانات التنبيه اللي بترجع من المنبه، بتتحقق من القيم)، `alerts/AlertTexts.kt` (نصوص الإشعار بالعربي)، `alerts/AlertScheduler.kt` (منبه واحد دقيق للتنبيه الجاي، بيستخدم `AlertPlanner`)، `alerts/SystemAlarmBackend.kt` (`AlarmManager`، دقيق لو مسموح وإلا تقريبي)، `alerts/AlertNotifications.kt` (قناتين: تذكيرات ومنبهات)، `alerts/AlertReceivers.kt` (`AlertReceiver` لما المنبه يرن، و`RescheduleReceiver` بعد إعادة التشغيل أو تحديث التطبيق أو تغيير الوقت أو المنطقة)، `MawaqitApp.kt` (بيعيد التخطيط كل ما القواعد أو «صليت» أو المدينة تتغير)، `AndroidManifest.xml` (4 صلاحيات + الـreceiver)، `res/drawable/ic_notification.xml` (أيقونة مؤقتة).
 - **اختبارات**: JVM: `AlertSchedulerTest` و`AlertTextsTest` و`FiredAlertTest` (19 اختبار جديد). على المحاكي: `androidTest/.../alerts/AlertsOnDeviceTest.kt` (3 اختبارات: القنوات، المنبه بيتحط وبيتلغي عبر `dumpsys alarm`، والـreceiver بيعرض الإشعار).
