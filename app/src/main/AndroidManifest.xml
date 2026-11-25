@@ -7,6 +7,13 @@
     <!-- Only when the user presses "حدد موقعي": one approximate position, used on the phone and never sent anywhere. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Alerts (phase 10): the notification itself (Android 13+), an alarm at the exact minute (Android 12+ lets the
+         user switch it off), planning again after a restart, and the vibration of the alarm channel. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".MawaqitApp"
         android:usesCleartextTraffic="false"
@@ -22,6 +29,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The alarm clock calls this at an alert's time (only this app can: not exported). -->
+        <receiver
+            android:name=".alerts.AlertReceiver"
+            android:exported="false" />
+
+        <!-- Only protected system broadcasts: restart, app update, clock or time zone change. Plans the next alert again. -->
+        <receiver
+            android:name=".alerts.RescheduleReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
