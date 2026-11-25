@@ -21,10 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -46,13 +43,19 @@ import work.ahmedhatem.mawaqit.year.YearModel
 
 /** The year result, a month at a time: every day on two lines, the date on the first and the six times on the second. */
 @Composable
-fun YearScreen(place: Place, calendar: HijriCalendar, today: LocalDate, modifier: Modifier = Modifier) {
-    // Kept as one number so the choice survives a rotation.
-    var monthIndex by rememberSaveable { mutableIntStateOf(today.year * 12 + today.monthValue - 1) }
+fun YearScreen(
+    place: Place,
+    calendar: HijriCalendar,
+    today: LocalDate,
+    /** The shown month as year * 12 + month - 1, kept by the caller so a search can move the table. */
+    monthIndex: Int,
+    onMonthIndex: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val month = YearModel.clamp(YearMonth.of(Math.floorDiv(monthIndex, 12), Math.floorMod(monthIndex, 12) + 1))
     fun go(delta: Int) {
         val moved = YearModel.shift(month, delta)
-        monthIndex = moved.year * 12 + moved.monthValue - 1
+        onMonthIndex(moved.year * 12 + moved.monthValue - 1)
     }
     val table = remember(month, place, calendar) { YearModel.build(month, place, calendar) }
 
@@ -81,7 +84,7 @@ fun YearScreen(place: Place, calendar: HijriCalendar, today: LocalDate, modifier
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             TextButton(onClick = { go(-12) }, modifier = Modifier.testTag("year_prev_year")) { Text(stringResource(R.string.year_prev_year)) }
-            TextButton(onClick = { monthIndex = today.year * 12 + today.monthValue - 1 }, modifier = Modifier.testTag("year_current")) {
+            TextButton(onClick = { onMonthIndex(today.year * 12 + today.monthValue - 1) }, modifier = Modifier.testTag("year_current")) {
                 Text(stringResource(R.string.year_today))
             }
             TextButton(onClick = { go(12) }, modifier = Modifier.testTag("year_next_year")) { Text(stringResource(R.string.year_next_year)) }

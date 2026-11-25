@@ -20,7 +20,8 @@ data class TodayModel(
     val date: LocalDate,
     val hijri: HijriDate,
     val rows: List<TimeRow>,
-    val next: NextTime,
+    /** The next time with its countdown; null when a chosen day other than the live one is shown. */
+    val next: NextTime?,
     /** The end of the period when prayer is discouraged after sunrise, in minutes after midnight. */
     val makruhEndsAt: Int,
     val dstConfirmed: Boolean,
@@ -28,20 +29,31 @@ data class TodayModel(
     val placeLabel: String,
 ) {
     companion object {
-        fun build(instant: Instant, settings: Settings, calendar: HijriCalendar): TodayModel =
-            build(EgyptClock.localDateTime(instant), settings, calendar)
-
-        fun build(now: LocalDateTime, settings: Settings, calendar: HijriCalendar): TodayModel {
+        /** The live day: the date of [instant] in Egypt, with the countdown measured from the instant itself. */
+        fun build(instant: Instant, settings: Settings, calendar: HijriCalendar): TodayModel {
             val place = settings.place
-            val times = PrayerCalculator.timesFor(now.toLocalDate(), place.latitude, place.longitude)
-            val next = Schedule.next(now, place.latitude, place.longitude)
-            // The highlighted row is the next time of today; after the last time of the day it is tomorrow's first,
+            val next = Schedule.next(instant, place.latitude, place.longitude)
+            return assemble(EgyptClock.localDateTime(instant).toLocalDate(), settings, calendar, next)
+        }
+
+        /** [build] for a local time (read with the rule of its date). */
+        fun build(now: LocalDateTime, settings: Settings, calendar: HijriCalendar): TodayModel =
+            build(EgyptClock.toInstant(now), settings, calendar)
+
+        /** Any other day: its times and dates, with no countdown and nothing marked as next. */
+        fun forDate(date: LocalDate, settings: Settings, calendar: HijriCalendar): TodayModel =
+            assemble(date, settings, calendar, next = null)
+
+        private fun assemble(date: LocalDate, settings: Settings, calendar: HijriCalendar, next: NextTime?): TodayModel {
+            val place = settings.place
+            val times = PrayerCalculator.timesFor(date, place.latitude, place.longitude)
+            // The highlighted row is the next time of this day; after the last time of the day it is tomorrow's first,
             // which is not on this list, so nothing is highlighted.
-            val nextToday = next.takeIf { it.date == now.toLocalDate() }?.prayer
+            val nextToday = next?.takeIf { it.date == date }?.prayer
             val rows = Prayer.entries.map { TimeRow(it, times[it], it == nextToday) }
             return TodayModel(
-                date = now.toLocalDate(),
-                hijri = calendar.dateOf(now.toLocalDate()),
+                date = date,
+                hijri = calendar.dateOf(date),
                 rows = rows,
                 next = next,
                 makruhEndsAt = times[Prayer.SUNRISE] + settings.makruhMinutes,
