@@ -60,5 +60,12 @@ Read STATUS.md first in every session.
 ## Standing rules
 - Full list of the adopted working rules (reply format, PR flow, auto-merge for non-guard PRs, guard files): `docs/standing-rules.md`. Read it at the start of every session. Added 2026-11-23 by Ahmed's order.
 
+## Decision log
+- `docs/decisions-log.md` is the record of Ahmed's decisions (DEC-001, DEC-002, ...). Append at the end only; never edit or delete an old entry except its "الحالة" line, and when a decision changes write a new DEC and mark the old one "اتلغى بـ DEC-0xx".
+- Any decision Ahmed states in my session is recorded in the same reply or the same day, with his exact words (date + session). Never record my own assumption as a decision. A line that is not Ahmed's exact words is marked `[استنتاج]` or `[لم يتأكد]`.
+- A decision said somewhere else that did not reach me in his exact words is recorded only with `[لم يتأكد]`, and I ask Ahmed.
+- A decision recorded on a `cloud/*` branch stays "مقرَّر" until that branch is merged. "منفَّذ" is written only with a PR number or commit.
+- Every PR description has a line `القرار المرتبط: DEC-0xx` or `القرار المرتبط: (لا يوجد: السبب)` (see `.github/PULL_REQUEST_TEMPLATE.md`).
+
 ## Learning
 - Any mistake: record as lesson + rule in the same reply. Deferred items become a PR after the current one.
