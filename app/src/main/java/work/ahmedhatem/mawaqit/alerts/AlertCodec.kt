@@ -8,10 +8,14 @@ import org.json.JSONObject
 import work.ahmedhatem.mawaqit.engine.Prayer
 import work.ahmedhatem.mawaqit.engine.alerts.AlertKind
 import work.ahmedhatem.mawaqit.engine.alerts.AlertRule
+import work.ahmedhatem.mawaqit.engine.alerts.AlertRules
 import work.ahmedhatem.mawaqit.engine.alerts.AlertTarget
 import work.ahmedhatem.mawaqit.engine.alerts.Recurrence
 
-/** What was read back: the rules that are fine, and how many entries were not (they are left out, never guessed). */
+/**
+ * What was read back: only rules that pass [AlertRules.problems] together as one list, and how many entries were left
+ * out (damaged ones and ones that break a rule, never guessed or repaired).
+ */
 data class DecodedRules(val rules: List<AlertRule>, val skipped: Int)
 
 /** The alert rules as text for the phone's storage. Everything read back is checked again, entry by entry. */
@@ -36,7 +40,9 @@ object AlertCodec {
             val rule = (array.opt(i) as? JSONObject)?.let { decodeRule(it) }
             if (rule == null) skipped++ else rules += rule
         }
-        return DecodedRules(rules, skipped)
+        // Whatever was written, only rules the engine accepts come back (a limit, a repeated id, a value out of range).
+        val broken = AlertRules.problemsByIndex(rules).map { it.first }.toSet()
+        return DecodedRules(rules.filterIndexed { i, _ -> i !in broken }, skipped + broken.size)
     }
 
     fun encodePrayed(prayed: Set<Pair<LocalDate, Prayer>>): String {
@@ -76,36 +82,48 @@ object AlertCodec {
         put("repeat", r.repeatEveryMinutes)
     }
 
+    // The org.json getters change types quietly (a fraction becomes 0, the text "true" becomes true, a number becomes
+    // text). A stored value must be exactly the type that was written, so each field is read raw and checked.
+    private fun JSONObject.text(key: String): String? = opt(key) as? String
+
+    private fun JSONObject.whole(key: String): Int? = when (val v = opt(key)) {
+        is Int -> v
+        is Long -> if (v in Int.MIN_VALUE..Int.MAX_VALUE) v.toInt() else null
+        else -> null
+    }
+
+    private fun JSONObject.flag(key: String): Boolean? = opt(key) as? Boolean
+
     /** Null for anything that is not exactly a rule: a missing or wrong-typed field, an unknown name, a bad date. */
     private fun decodeRule(o: JSONObject): AlertRule? {
         return try {
-            val id = o.getString("id").takeIf { it.isNotEmpty() } ?: return null
-            val kind = AlertKind.entries.firstOrNull { it.name == o.getString("kind") } ?: return null
-            val names = o.getJSONArray("targets")
+            val id = o.text("id")?.takeIf { it.isNotEmpty() } ?: return null
+            val kind = AlertKind.entries.firstOrNull { it.name == o.text("kind") } ?: return null
+            val names = o.opt("targets") as? JSONArray ?: return null
             val targets = LinkedHashSet<AlertTarget>()
             for (i in 0 until names.length()) {
-                targets += AlertTarget.entries.firstOrNull { it.name == names.getString(i) } ?: return null
+                val name = names.opt(i) as? String ?: return null
+                targets += AlertTarget.entries.firstOrNull { it.name == name } ?: return null
             }
-            val rec = o.getJSONObject("recurrence")
-            val recurrence = when (rec.getString("type")) {
+            val rec = o.opt("recurrence") as? JSONObject ?: return null
+            val recurrence = when (rec.text("type")) {
                 "daily" -> Recurrence.Daily
-                "range" -> Recurrence.Range(LocalDate.parse(rec.getString("from")), LocalDate.parse(rec.getString("to")))
-                "once" -> Recurrence.Once(LocalDate.parse(rec.getString("date")))
+                "range" -> Recurrence.Range(LocalDate.parse(rec.text("from") ?: return null), LocalDate.parse(rec.text("to") ?: return null))
+                "once" -> Recurrence.Once(LocalDate.parse(rec.text("date") ?: return null))
                 else -> return null
             }
+            val sound = if (o.has("sound")) (o.text("sound") ?: return null) else null
             AlertRule(
                 id = id,
                 kind = kind,
                 targets = targets,
-                offsetMinutes = o.getInt("offset"),
+                offsetMinutes = o.whole("offset") ?: return null,
                 recurrence = recurrence,
-                enabled = o.getBoolean("enabled"),
-                flash = o.getBoolean("flash"),
-                soundUri = if (o.has("sound")) o.getString("sound") else null,
-                repeatEveryMinutes = o.getInt("repeat"),
+                enabled = o.flag("enabled") ?: return null,
+                flash = o.flag("flash") ?: return null,
+                soundUri = sound,
+                repeatEveryMinutes = o.whole("repeat") ?: return null,
             )
-        } catch (e: JSONException) {
-            null
         } catch (e: DateTimeParseException) {
             null
         }

@@ -76,6 +76,39 @@ class AlertCodecTest {
     @Test fun badDate() = skipped { it.put("recurrence", JSONObject().put("type", "once").put("date", "2026-13-40")) }
     @Test fun missingRepeat() = skipped { it.remove("repeat") }
 
+    // A value must be exactly the type that was written: no quiet conversion of a fraction, a text or a number.
+    @Test fun fractionalOffset() = skipped { it.put("offset", -0.5) }
+    @Test fun offsetTooBigForANumber() = skipped { it.put("offset", 99999999999L) }
+    @Test fun enabledAsText() = skipped { it.put("enabled", "true") }
+    @Test fun flashAsNumber() = skipped { it.put("flash", 1) }
+    @Test fun idAsNumber() = skipped { it.put("id", 5) }
+    @Test fun kindAsNumber() = skipped { it.put("kind", 3) }
+    @Test fun soundAsNumber() = skipped { it.put("sound", 7) }
+    @Test fun targetAsNumber() = skipped { it.put("targets", JSONArray().put(1)) }
+    @Test fun recurrenceAsText() = skipped { it.put("recurrence", "daily") }
+    @Test fun dateAsNumber() = skipped { it.put("recurrence", JSONObject().put("type", "once").put("date", 20261125)) }
+    @Test fun missingRangeEnd() = skipped { it.put("recurrence", JSONObject().put("type", "range").put("from", "2026-11-25")) }
+
+    @Test
+    fun rulesTheEngineRefusesDoNotComeBack() {
+        val ok = AlertRule("ok", AlertKind.ALARM, setOf(AlertTarget.ASR), -30)
+        val tooFar = AlertCodec.encode(listOf(ok.copy(id = "far", offsetMinutes = -30)))
+        val array = JSONArray(AlertCodec.encode(listOf(ok)))
+        array.put(JSONArray(tooFar).getJSONObject(0).put("offset", 181))
+        array.put(JSONArray(AlertCodec.encode(listOf(ok))).getJSONObject(0)) // same id as the first
+        val back = AlertCodec.decode(array.toString())
+        assertEquals(listOf(ok), back.rules)
+        assertEquals(2, back.skipped)
+    }
+
+    @Test
+    fun theFourthAlertBeforeTheSameTimeDoesNotComeBack() {
+        val four = (1..4).map { AlertRule("r$it", AlertKind.ALARM, setOf(AlertTarget.ASR), -it * 10) }
+        val back = AlertCodec.decode(AlertCodec.encode(four))
+        assertEquals(four.take(3), back.rules)
+        assertEquals(1, back.skipped)
+    }
+
     @Test
     fun extraFieldsAreIgnoredAndTheSoundIsOptional() {
         val back = AlertCodec.decode(json { it.put("future", "x"); it.remove("sound") })

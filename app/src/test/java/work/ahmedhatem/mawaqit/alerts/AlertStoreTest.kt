@@ -75,6 +75,15 @@ class AlertStoreTest {
     }
 
     @Test
+    fun anEmptyIdIsRefusedAndTheOldListStays() = runBlocking {
+        val store = AlertStore(dataStore())
+        val good = listOf(rule("a"))
+        store.save(good)
+        assertEquals(SaveResult.INVALID, store.save(listOf(rule("a"), rule(""))))
+        assertEquals(good, store.rules.first().rules)
+    }
+
+    @Test
     fun theFourthAlertBeforeOneTimeIsRefused() = runBlocking {
         val store = AlertStore(dataStore())
         assertEquals(SaveResult.SAVED, store.save(listOf(rule("1", -10), rule("2", -20), rule("3", -30))))
