@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Decision log reminder: if this message from Ahmed approves, rejects or chooses something, add a DEC entry to docs/decisions-log.md (his exact words, date, reason, rejected options). Every PR body needs the line: القرار المرتبط: DEC-0xx or (لا يوجد: السبب).'"
+          }
+        ]
+      }
+    ]
+  }
+}
