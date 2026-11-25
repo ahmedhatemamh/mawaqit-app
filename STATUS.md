@@ -2,6 +2,34 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-25 17:28 (Cairo) - تسليم لجلسة جديدة: 10ب2 (الجدولة والإشعارات) مكتوب ومدفوع من غير PR، وبانتظار الخبير
+
+**اقرا ده الأول في الجلسة الجديدة.**
+
+### وضع 10ب2 (فرع `feat/alerts-scheduling`، آخر commit `20d6a38`، مدفوع، ما فيش PR)
+- **اتكتب** (كله تحت `app/`): `alerts/FiredAlert.kt` (بيانات التنبيه اللي بترجع من المنبه، بتتحقق من القيم)، `alerts/AlertTexts.kt` (نصوص الإشعار بالعربي)، `alerts/AlertScheduler.kt` (منبه واحد دقيق للتنبيه الجاي، بيستخدم `AlertPlanner`)، `alerts/SystemAlarmBackend.kt` (`AlarmManager`، دقيق لو مسموح وإلا تقريبي)، `alerts/AlertNotifications.kt` (قناتين: تذكيرات ومنبهات)، `alerts/AlertReceivers.kt` (`AlertReceiver` لما المنبه يرن، و`RescheduleReceiver` بعد إعادة التشغيل أو تحديث التطبيق أو تغيير الوقت أو المنطقة)، `MawaqitApp.kt` (بيعيد التخطيط كل ما القواعد أو «صليت» أو المدينة تتغير)، `AndroidManifest.xml` (4 صلاحيات + الـreceiver)، `res/drawable/ic_notification.xml` (أيقونة مؤقتة).
+- **اختبارات**: JVM: `AlertSchedulerTest` و`AlertTextsTest` و`FiredAlertTest` (19 اختبار جديد). على المحاكي: `androidTest/.../alerts/AlertsOnDeviceTest.kt` (3 اختبارات: القنوات، المنبه بيتحط وبيتلغي عبر `dumpsys alarm`، والـreceiver بيعرض الإشعار).
+- **نتيجة محلية على 20d6a38**: `:engine:test` 76 اختبار و`:app:testDebugUnitTest` 153 اختبار، 0 فشل؛ `:app:lintDebug` 0 أخطاء (15 تحذير قديم من إصدارات المكتبات وأيقونة التطبيق)؛ `:app:assembleDebug` و`:app:compileDebugAndroidTestKotlin` نجحوا.
+- **ما اتكتبش لسه**: أزرار «صليت» و«إيقاف» في الإشعار، تكرار السؤال لو الإجابة «لا» (`repeatEveryMinutes`)، الفلاش، الصوت المختار وحد الـ5 دقايق، شاشة التنبيهات (10ج) وطلب الصلاحيات وقت إنشاء أول تنبيه (قرار 3أ) وملحوظة الإسقاط عند الإنشاء، 10د (الصوت والأذان).
+- **لم أتحقق**: (1) `AlertsOnDeviceTest` ما اتشغلش؛ بيشتغل على CI بس بعد فتح PR. (2) سلوك المنبه تحت Doze وتوفير الطاقة على جهاز حقيقي. (3) سياسة Google Play لصلاحية `SCHEDULE_EXACT_ALARM` لتطبيق مواقيت. (4) هل `RescheduleReceiver` بيستلم `TIME_SET` على كل الإصدارات.
+
+### ينتظر قبل فتح PR الجدولة (أمر أحمد + DEC-035)
+1. دمج PR #15 (الخبراء) بإيد أحمد، وجلسة جديدة بتحمّل `.claude/agents/`.
+2. استدعاء `alarm-reliability-auditor` **فعليًا** (مش مساعد عام بأدوات كاملة) على `feat/alerts-scheduling`، وتسجيل الاستدعاء في `docs/agents-log.md`، وتحقق القائد من كل نقطة.
+3. مراجعة ثانية مستقلة (CodeRabbit بعد فتح PR، أو خبير آخر) قبل الدمج. حد CodeRabbit: مراجعة كل 62 دقيقة، وآخر طلب مقبول 12:54 UTC.
+4. بعد ما أحمد يقرأ PR الجدولة، الدمج بإيده لأن فيه تعديل على `AndroidManifest.xml` (يستدعي `privacy-security-auditor` كمان حسب قاعدة الاستدعاء).
+
+### PR مفتوحة (لحظة كتابة السطر ده، ما اتدمجوش)
+- **#15** (خبراء + `agents-log` + هوك أسبوعي + DEC-034..037، ملفات حراسة): `build` و`emulator` و`decision-link` خضرا، mergeable clean. فرع `chore/project-experts`.
+- **#14** (`plan.md` صف 8: 28-3): نفس الفحوصات خضرا، docs فقط. فرع `docs/plan-hijri-days`.
+
+### شغل مؤجل بعد دمج #15 و#14
+- تحديث حالة DEC-034 لـ037 لـ«منفَّذ (مدموج في PR رقم كذا)»، وتغيير وسم الاقتباسين [لم يتأكد] إلى «مؤكد من المستشار» (أمر أحمد).
+- جرّب إعادة تحميل الخبراء في نفس الجلسة (`/agents` أو غيره) وسجّل بالظبط إيه اتجرب وإيه النتيجة.
+- PR صغير منفصل لقاعدة «كرت PR نصي كامل في كل تقرير» في `docs/standing-rules.md` + قرار DEC-038.
+- PR منفصل لقياس وقت أول شاشة مقابل وعد الثانيتين.
+- بانتظار أحمد: تصميماته، ردود ESA وNRIAG.
+
 ## 2026-11-25 15:14 (Cairo) - سجل القرارات وقاعدة CodeRabbit اندمجوا (PR رقم 12 و13 في mawaqit-app)
 
 - PR #12 (b088de3): `.coderabbit.yaml` (المراجعة التلقائية مقفولة) وقاعدة 62 دقيقة في `CLAUDE.md` و`docs/standing-rules.md`. اتأكد على GitHub: CodeRabbit رد «Review skipped، Auto reviews are disabled» على نفس الـPR.
