@@ -99,6 +99,7 @@ class AlertsOnDeviceTest {
     fun theReceiverShowsTheNotificationOfAnAlarmThatFires() {
         val intent = Intent(context, AlertReceiver::class.java).setAction(SystemAlarmBackend.ACTION_FIRE)
         alert.toMap().forEach { (k, v) -> intent.putExtra(k, v) }
+        val sentAt = Instant.now()
         context.sendBroadcast(intent)
         val id = AlertNotifications.notificationId(alert)
         val deadline = System.currentTimeMillis() + UI_WAIT_MS
@@ -108,9 +109,12 @@ class AlertsOnDeviceTest {
             shown = notifications.activeNotifications.firstOrNull { it.id == id }
         }
         assertTrue("the notification appeared", shown != null)
-        val text = AlertTexts.of(alert)
-        assertEquals(text.title, shown!!.notification.extras.getString("android.title"))
-        assertEquals(text.body, shown.notification.extras.getString("android.text"))
+        val seenAt = Instant.now()
+        // The words count minutes from the moment of showing, which is somewhere between sending and seeing: any minute in that span is right.
+        val possible = generateSequence(sentAt) { it.plusSeconds(15) }.takeWhile { it < seenAt }.plus(seenAt).map { AlertTexts.of(alert, it) }.toList()
+        assertEquals(possible.first().title, shown!!.notification.extras.getString("android.title"))
+        val body = shown.notification.extras.getString("android.text")
+        assertTrue("the body $body is one of ${possible.map { it.body }.toSet()}", possible.any { it.body == body })
         assertEquals(AlertNotifications.ALARMS, shown.notification.channelId)
     }
 }

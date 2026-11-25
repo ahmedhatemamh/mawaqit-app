@@ -23,7 +23,7 @@ object AlertPlanning {
     private val lock = Mutex()
 
     /** [companions] are the alerts due together with the fired one; they are found before the alarm is set, so a failure to set it does not lose them. */
-    class Outcome(val settings: Settings, val companions: List<FiredAlert>, val plan: Result<Plan>)
+    class Outcome(val settings: Settings, val firedStillWanted: Boolean, val companions: List<FiredAlert>, val plan: Result<Plan>)
 
     suspend fun run(context: Context, now: Instant, fired: FiredAlert?): Outcome = lock.withLock {
         val app = context.applicationContext
@@ -32,7 +32,8 @@ object AlertPlanning {
         val settings = settingsStore(app).settings.first()
         val scheduler = AlertScheduler(SystemAlarmBackend(app))
         val companions = fired?.let { scheduler.companionsOf(it, rules, settings, prayed, until = now) } ?: emptyList()
-        Outcome(settings, companions, runCatching { scheduler.reschedule(rules, settings, prayed, now) })
+        val wanted = fired == null || !scheduler.isAnswered(fired, prayed)
+        Outcome(settings, wanted, companions, runCatching { scheduler.reschedule(rules, settings, prayed, now) })
     }
 }
 
@@ -59,10 +60,12 @@ class AlertReceiver : BroadcastReceiver() {
                 val from = maxOf(now, alert?.let { Instant.ofEpochMilli(it.atMillis) } ?: Instant.EPOCH)
                 val outcome = runCatching { AlertPlanning.run(context, from, alert) }
                 if (alert == null) Log.w(TAG, "Alarm fired with a damaged alert; nothing shown")
-                val settings = outcome.getOrNull()?.settings
-                // Counted from the moment of showing, and each notification goes away at the next prayer time (never sooner than the minimum).
-                val expiresAt = settings?.let { AlertScheduler.expiryAfter(from, it) }
-                for (a in listOfNotNull(alert) + (outcome.getOrNull()?.companions ?: emptyList())) {
+                // Counted from the moment of showing, and each notification goes away at the next prayer time (never sooner than
+                // the minimum). If the saved settings could not be read, the default place is used so it still goes away.
+                val expiresAt = AlertScheduler.expiryAfter(from, outcome.getOrNull()?.settings ?: Settings())
+                // The fired alert is dropped only when the saved answers say its question was already answered.
+                val firedToShow = alert.takeIf { outcome.getOrNull()?.firedStillWanted ?: true }
+                for (a in listOfNotNull(firedToShow) + (outcome.getOrNull()?.companions ?: emptyList())) {
                     if (!AlertNotifications.show(context, a, from, expiresAt)) Log.w(TAG, "Notifications are not allowed; alert ${a.ruleId} not shown")
                 }
                 (outcome.exceptionOrNull() ?: outcome.getOrNull()?.plan?.exceptionOrNull())?.let { throw it }

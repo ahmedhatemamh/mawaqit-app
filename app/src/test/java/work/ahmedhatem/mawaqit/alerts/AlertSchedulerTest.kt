@@ -211,4 +211,25 @@ class AlertSchedulerTest {
         assertEquals(shownAt.plusSeconds(AlertScheduler.MIN_VISIBLE_MINUTES * 60), AlertScheduler.expiryAfter(shownAt, settings))
         assertEquals(15L, AlertScheduler.MIN_VISIBLE_MINUTES)
     }
+
+    @Test
+    fun aQuestionAlreadyAnsweredIsNotShownEvenIfTheAlarmWasSetBefore() {
+        val backend = FakeBackend()
+        plan(backend, listOf(rule("alarm")))
+        val asrBefore = backend.scheduled.single().first // asks about Dhuhr on `day`
+        val scheduler = AlertScheduler(backend)
+        assertTrue(!scheduler.isAnswered(asrBefore, emptySet()))
+        assertTrue(scheduler.isAnswered(asrBefore, setOf(day to Prayer.DHUHR)))
+        assertTrue(!scheduler.isAnswered(asrBefore, setOf(day.minusDays(1) to Prayer.DHUHR, day to Prayer.ASR)))
+        // Before Fajr the question is about yesterday's Isha.
+        val fajr = AlertRule("fajr", AlertKind.ALARM, setOf(AlertTarget.FAJR), -30)
+        val b2 = FakeBackend()
+        plan(b2, listOf(fajr))
+        val fajrAlert = b2.scheduled.single().first
+        assertTrue(scheduler.isAnswered(fajrAlert, setOf(day.minusDays(1) to Prayer.ISHA)))
+        assertTrue(!scheduler.isAnswered(fajrAlert, setOf(day to Prayer.ISHA)))
+        // A reminder or an "after" alert asks nothing.
+        val reminder = FiredAlert("r", AlertKind.REMINDER, AlertTarget.ASR, AlertRole.BEFORE, -30, null, asr(day).toEpochMilli())
+        assertTrue(!scheduler.isAnswered(reminder, setOf(day to Prayer.DHUHR)))
+    }
 }

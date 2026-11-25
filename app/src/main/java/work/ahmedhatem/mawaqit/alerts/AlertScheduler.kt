@@ -2,9 +2,11 @@ package work.ahmedhatem.mawaqit.alerts
 
 import java.time.Instant
 import java.time.LocalDate
+import work.ahmedhatem.mawaqit.engine.EgyptClock
 import work.ahmedhatem.mawaqit.engine.Prayer
 import work.ahmedhatem.mawaqit.engine.alerts.AlertPlanner
 import work.ahmedhatem.mawaqit.engine.alerts.AlertRule
+import work.ahmedhatem.mawaqit.engine.alerts.AlertTarget
 import work.ahmedhatem.mawaqit.engine.alerts.Occurrence
 import work.ahmedhatem.mawaqit.settings.Settings
 
@@ -61,6 +63,15 @@ class AlertScheduler(private val backend: AlarmBackend) {
             rules, at.minusSeconds(1), MAX_SIMULTANEOUS, settings.place.latitude, settings.place.longitude,
             settings.makruhMinutes, prayed, NEAR_LOOK_AHEAD_DAYS,
         ).filter { it.at <= maxOf(at, until) && !(it.ruleId == fired.ruleId && it.target == fired.target) }.map { FiredAlert.of(it) }
+    }
+
+    /** True when the user already answered "I prayed" for the question [fired] asks, so it must not be shown (the answer may arrive after the alarm was set). */
+    fun isAnswered(fired: FiredAlert, prayed: Set<Pair<LocalDate, Prayer>>): Boolean {
+        val question = fired.question ?: return false
+        val targetAt = Instant.ofEpochMilli(fired.atMillis - fired.offsetMinutes * 60_000L)
+        val date = EgyptClock.localDateTime(targetAt).toLocalDate()
+        val questionDate = if (fired.target == AlertTarget.FAJR) date.minusDays(1) else date
+        return (questionDate to AlertPlanner.questionPrayer(question)) in prayed
     }
 
     private fun nextOccurrence(rules: List<AlertRule>, settings: Settings, prayed: Set<Pair<LocalDate, Prayer>>, now: Instant, maxDays: Int) =
