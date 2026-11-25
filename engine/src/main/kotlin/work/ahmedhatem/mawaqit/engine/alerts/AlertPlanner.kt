@@ -33,6 +33,8 @@ data class Occurrence(
  * phone's job and read this list. A rule with any problem ([AlertRules.problems]) or switched off never fires.
  */
 object AlertPlanner {
+    const val DEFAULT_MAX_DAYS = 14
+
     private val ORDER = listOf(
         AlertTarget.FAJR, AlertTarget.SUNRISE, AlertTarget.DHUHR, AlertTarget.ASR, AlertTarget.MAGHRIB, AlertTarget.ISHA,
     )
@@ -50,7 +52,7 @@ object AlertPlanner {
         longitude: Double,
         makruhMinutes: Int,
         prayed: Set<Pair<LocalDate, Prayer>> = emptySet(),
-        maxDays: Int = 14,
+        maxDays: Int = DEFAULT_MAX_DAYS,
     ): List<Occurrence> {
         require(count > 0 && maxDays > 0)
         val broken = AlertRules.problemsByIndex(rules).map { it.first }.toSet()

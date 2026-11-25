@@ -34,13 +34,38 @@ class AlertScheduler(private val backend: AlarmBackend) {
         prayed: Set<Pair<LocalDate, Prayer>>,
         now: Instant,
     ): Plan {
-        val next = AlertPlanner.upcoming(
-            rules, now, 1, settings.place.latitude, settings.place.longitude, settings.makruhMinutes, prayed,
-        ).firstOrNull()
+        val next = nextOccurrence(rules, settings, prayed, now, AlertPlanner.DEFAULT_MAX_DAYS)
+            // A one-day or date-range rule can start further ahead than the usual look-ahead; nothing else would plan it later.
+            ?: nextOccurrence(rules, settings, prayed, now, FAR_LOOK_AHEAD_DAYS)
         if (next == null) {
             backend.cancel()
             return Plan.None
         }
         return Plan.Scheduled(next, backend.schedule(FiredAlert.of(next), next.at))
+    }
+
+    /**
+     * The other alerts due at the very minute of [fired] (the alarm clock holds one entry, so a reminder and an alarm
+     * set for the same time arrive together and the receiver shows them all). Answers given since then are respected.
+     */
+    fun companionsOf(fired: FiredAlert, rules: List<AlertRule>, settings: Settings, prayed: Set<Pair<LocalDate, Prayer>>): List<FiredAlert> {
+        val at = Instant.ofEpochMilli(fired.atMillis)
+        return AlertPlanner.upcoming(
+            rules, at.minusSeconds(1), MAX_SIMULTANEOUS, settings.place.latitude, settings.place.longitude,
+            settings.makruhMinutes, prayed, NEAR_LOOK_AHEAD_DAYS,
+        ).filter { it.at == at && !(it.ruleId == fired.ruleId && it.target == fired.target) }.map { FiredAlert.of(it) }
+    }
+
+    private fun nextOccurrence(rules: List<AlertRule>, settings: Settings, prayed: Set<Pair<LocalDate, Prayer>>, now: Instant, maxDays: Int) =
+        AlertPlanner.upcoming(
+            rules, now, 1, settings.place.latitude, settings.place.longitude, settings.makruhMinutes, prayed, maxDays,
+        ).firstOrNull()
+
+    private companion object {
+        const val FAR_LOOK_AHEAD_DAYS = 400
+        const val NEAR_LOOK_AHEAD_DAYS = 2
+
+        /** More than the rules can ever put on one minute (3 per kind and side for each of the 7 times). */
+        const val MAX_SIMULTANEOUS = 100
     }
 }

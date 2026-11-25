@@ -106,4 +106,48 @@ class AlertSchedulerTest {
         plan(backend, listOf(rule("late", -10), rule("early", -90)))
         assertEquals("early", backend.scheduled.single().first.ruleId)
     }
+
+    @Test
+    fun alertsAtTheSameMomentAreAllShownNotOnlyTheFirst() {
+        // A reminder and an alarm 30 minutes before Asr fall on the same minute: one alarm clock entry, two notifications.
+        val rules = listOf(rule("alarm"), rule("reminder", kind = AlertKind.REMINDER))
+        val backend = FakeBackend()
+        plan(backend, rules)
+        val first = backend.scheduled.single().first
+        val others = AlertScheduler(backend).companionsOf(first, rules, settings, emptySet())
+        assertEquals(1, others.size)
+        assertNotEquals(first.ruleId, others.single().ruleId)
+        assertEquals(first.atMillis, others.single().atMillis)
+    }
+
+    @Test
+    fun aloneAlertHasNoCompanionsAndAnAnsweredQuestionIsNotAskedAgain() {
+        val backend = FakeBackend()
+        val rules = listOf(rule("a"), rule("b", offset = -45))
+        plan(backend, rules)
+        val first = backend.scheduled.single().first
+        assertEquals("b", first.ruleId)
+        assertTrue(AlertScheduler(backend).companionsOf(first, rules, settings, emptySet()).isEmpty())
+
+        // An alarm (asks about Dhuhr) and a reminder at the same minute: once Dhuhr is answered only the reminder remains.
+        val both = listOf(rule("alarm"), rule("reminder", kind = AlertKind.REMINDER))
+        val prayed = setOf(day to Prayer.DHUHR)
+        val b2 = FakeBackend()
+        plan(b2, both, prayed = prayed)
+        val only = b2.scheduled.single().first
+        assertEquals("reminder", only.ruleId)
+        assertEquals(asr(day).minusSeconds(30 * 60), b2.scheduled.single().second)
+        assertTrue(AlertScheduler(b2).companionsOf(only, both, settings, prayed).isEmpty())
+    }
+
+    @Test
+    fun aOneDayRuleMoreThanTwoWeeksAheadIsStillScheduled() {
+        val far = day.plusDays(100)
+        val rule = AlertRule("far", AlertKind.REMINDER, setOf(AlertTarget.ASR), -30, recurrence = work.ahmedhatem.mawaqit.engine.alerts.Recurrence.Once(far))
+        val backend = FakeBackend()
+        val result = plan(backend, listOf(rule))
+        assertTrue(result is Plan.Scheduled)
+        assertEquals(asr(far).minusSeconds(30 * 60), backend.scheduled.single().second)
+        assertEquals(0, backend.cancels)
+    }
 }

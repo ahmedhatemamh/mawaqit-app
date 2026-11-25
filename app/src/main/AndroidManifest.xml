@@ -35,7 +35,7 @@
             android:name=".alerts.AlertReceiver"
             android:exported="false" />
 
-        <!-- Only protected system broadcasts: restart, app update, clock or time zone change. Plans the next alert again. -->
+        <!-- Only protected system broadcasts: restart, app update, clock or time zone change, exact-alarm permission granted. Plans the next alert again. -->
         <receiver
             android:name=".alerts.RescheduleReceiver"
             android:exported="true">
@@ -44,6 +44,7 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
     </application>
