@@ -41,7 +41,7 @@ class MainActivityTest {
     }
 
     private fun waitForToday() {
-        rule.waitUntil(timeoutMillis = 10_000) {
+        rule.waitUntil(timeoutMillis = UI_WAIT_MS) {
             rule.onAllNodesWithTagExists("row_FAJR")
         }
     }
@@ -80,7 +80,7 @@ class MainActivityTest {
         rule.onNodeWithTag("pick_city").performClick()
         rule.onNodeWithTag("city_search").performTextInput("اسوان")
         rule.onNodeWithTag("city_أسوان").performClick()
-        rule.waitUntil(timeoutMillis = 5_000) { runBlocking { store.settings.first() }.place.label == "أسوان" }
+        rule.waitUntil(timeoutMillis = UI_WAIT_MS) { runBlocking { store.settings.first() }.place.label == "أسوان" }
         rule.onNodeWithTag("current_place").assertTextContains("أسوان", substring = true)
         rule.onNodeWithTag("tab_TODAY").performClick()
         rule.onNodeWithTag("place").performScrollTo().assertTextContains("أسوان", substring = true)
@@ -95,7 +95,7 @@ class MainActivityTest {
         rule.onNodeWithTag("tab_SETTINGS").performClick()
         rule.onNodeWithTag("makruh_25").performScrollTo().assertIsSelected()
         rule.onNodeWithTag("makruh_10").performScrollTo().performClick()
-        rule.waitUntil(timeoutMillis = 5_000) {
+        rule.waitUntil(timeoutMillis = UI_WAIT_MS) {
             runBlocking { store.settings.first() }.makruhMinutes == 10
         }
         rule.onNodeWithTag("makruh_10").assertIsSelected()

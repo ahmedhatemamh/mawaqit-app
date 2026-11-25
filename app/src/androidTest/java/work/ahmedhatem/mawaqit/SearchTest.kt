@@ -39,7 +39,7 @@ class SearchTest {
     private fun reset() = runBlocking { store.chooseCity("القاهرة"); Unit }
 
     private fun open() {
-        rule.waitUntil(30_000) { rule.onAllNodes(hasTestTag("search_open")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(UI_WAIT_MS) { rule.onAllNodes(hasTestTag("search_open")).fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithTag("search_open").performClick()
     }
 
@@ -60,10 +60,10 @@ class SearchTest {
         open()
         fill("1", "3", "2025")
         rule.onNodeWithTag("search_go").performClick()
-        rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(UI_WAIT_MS) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
         expectShown("gregorian", ArabicFormat.gregorian(LocalDate.of(2025, 3, 1)))
         rule.onNodeWithTag("back_to_today").performClick()
-        rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isEmpty() }
+        rule.waitUntil(UI_WAIT_MS) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isEmpty() }
         val today = EgyptClock.localDateTime(Instant.now()).toLocalDate()
         expectShown("gregorian", ArabicFormat.gregorian(today))
     }
@@ -74,7 +74,7 @@ class SearchTest {
         rule.onNodeWithTag("search_hijri").performClick()
         fill("1", "9", "1446")
         rule.onNodeWithTag("search_go").performClick()
-        rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(UI_WAIT_MS) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
         // The device may hold a newer synced calendar than the bundled one, so the shown day is checked by its own Hijri date.
         rule.onNodeWithTag("hijri").assertTextContains("1 ${ArabicFormat.hijriMonthName(9)} 1446")
     }
@@ -93,7 +93,7 @@ class SearchTest {
         open()
         fill("", "", "2030")
         rule.onNodeWithTag("search_go").performClick()
-        rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("year_title")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(UI_WAIT_MS) { rule.onAllNodes(hasTestTag("year_title")).fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithTag("year_title").assertTextContains("${ArabicFormat.gregorianMonthName(1)} 2030")
     }
 }
