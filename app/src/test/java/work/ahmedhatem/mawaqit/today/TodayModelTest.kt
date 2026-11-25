@@ -125,11 +125,13 @@ class TodayModelTest {
     @Test
     fun countdownAcrossTheRepeatedOctoberHourUsesRealElapsedTime() {
         // 2026-10-29 is the last Thursday of October: clocks go back at 24:00 -> 23:00 local, so that hour happens twice.
-        val before = Instant.parse("2026-10-29T20:30:00Z") // 23:30 summer time, first pass
-        val m = TodayModel.build(before, settings, calendar)
-        val n = m.next!!
-        val target = work.ahmedhatem.mawaqit.engine.EgyptClock.toInstant(n.date.atStartOfDay().plusMinutes(n.minute.toLong()))
-        assertEquals(Prayer.FAJR, n.prayer)
-        assertEquals(java.time.Duration.between(before, target).seconds, n.secondsUntil.toLong())
+        // 20:30Z is 23:30 summer time (first pass); 21:30Z is 23:30 winter time (second pass).
+        for (text in listOf("2026-10-29T20:30:00Z", "2026-10-29T21:30:00Z")) {
+            val before = Instant.parse(text)
+            val n = TodayModel.build(before, settings, calendar).next!!
+            val target = work.ahmedhatem.mawaqit.engine.EgyptClock.toInstant(n.date.atStartOfDay().plusMinutes(n.minute.toLong()))
+            assertEquals(Prayer.FAJR, n.prayer)
+            assertEquals(text, java.time.Duration.between(before, target).seconds, n.secondsUntil.toLong())
+        }
     }
 }

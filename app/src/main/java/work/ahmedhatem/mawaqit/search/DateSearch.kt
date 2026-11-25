@@ -90,8 +90,10 @@ object DateSearch {
         // The Hijri years whose first day is inside the table's years: about 1370 to 1520.
         if (y !in 1300..1600) return SearchResult.Invalid(SearchError.YEAR_OUT_OF_RANGE)
         val start = calendar.startOfMonth(y, m ?: 1).first
-        if (start.year !in YearModel.FIRST_YEAR..YearModel.LAST_YEAR) return SearchResult.Invalid(SearchError.YEAR_OUT_OF_RANGE)
-        if (d == null) return SearchResult.Month(YearMonth.from(start))
+        if (d == null) {
+            if (start.year !in YearModel.FIRST_YEAR..YearModel.LAST_YEAR) return SearchResult.Invalid(SearchError.YEAR_OUT_OF_RANGE)
+            return SearchResult.Month(YearMonth.from(start))
+        }
         // The month ends where the next one starts, so its length is the distance between the two starts.
         val next = if (m == 12) calendar.startOfMonth(y + 1, 1).first else calendar.startOfMonth(y, m!! + 1).first
         val length = (next.toEpochDay() - start.toEpochDay()).toInt()

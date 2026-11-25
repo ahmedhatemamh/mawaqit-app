@@ -102,6 +102,17 @@ class DateSearchTest {
     }
 
     @Test
+    fun aHijriMonthThatStartsBeforeTheTableStillGivesItsDaysInsideIt() {
+        // 1 January 1950 is in the table even though its Hijri month began in December 1949.
+        val first = LocalDate.of(1950, 1, 1)
+        val h = calendar.dateOf(first)
+        assertEquals(SearchResult.Day(first), hijri(h.day.toString(), h.month.toString(), h.year.toString()))
+        // the day before the table is refused
+        val before = calendar.dateOf(LocalDate.of(1949, 12, 31))
+        assertEquals(invalid(SearchError.YEAR_OUT_OF_RANGE), hijri(before.day.toString(), before.month.toString(), before.year.toString()))
+    }
+
+    @Test
     fun numberParserRejectsEmptyAndLongText() {
         assertNull(DateSearch.number(""))
         assertNull(DateSearch.number("1234567"))

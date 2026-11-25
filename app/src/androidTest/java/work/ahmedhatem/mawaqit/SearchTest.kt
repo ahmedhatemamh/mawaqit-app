@@ -1,6 +1,7 @@
 package work.ahmedhatem.mawaqit
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -15,7 +16,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
+import java.time.LocalDate
+import work.ahmedhatem.mawaqit.engine.EgyptClock
 import work.ahmedhatem.mawaqit.settings.settingsStore
+import work.ahmedhatem.mawaqit.ui.ArabicFormat
 
 @RunWith(AndroidJUnit4::class)
 class SearchTest {
@@ -49,9 +54,11 @@ class SearchTest {
         fill("1", "3", "2025")
         rule.onNodeWithTag("search_go").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNodeWithTag("gregorian").assertIsDisplayed()
+        rule.onNodeWithTag("gregorian").assertTextContains(ArabicFormat.gregorian(LocalDate.of(2025, 3, 1)))
         rule.onNodeWithTag("back_to_today").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isEmpty() }
+        val today = EgyptClock.localDateTime(Instant.now()).toLocalDate()
+        rule.onNodeWithTag("gregorian").assertTextContains(ArabicFormat.gregorian(today))
     }
 
     @Test
@@ -61,7 +68,9 @@ class SearchTest {
         fill("1", "9", "1446")
         rule.onNodeWithTag("search_go").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNodeWithTag("gregorian").assertIsDisplayed()
+        // 1 Ramadan 1446 is 1 March 2025 (official month start).
+        rule.onNodeWithTag("gregorian").assertTextContains(ArabicFormat.gregorian(LocalDate.of(2025, 3, 1)))
+        rule.onNodeWithTag("hijri").assertTextContains("1 ${ArabicFormat.hijriMonthName(9)} 1446")
     }
 
     @Test
@@ -79,5 +88,6 @@ class SearchTest {
         fill("", "", "2030")
         rule.onNodeWithTag("search_go").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("year_title")).fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithTag("year_title").assertTextContains("${ArabicFormat.gregorianMonthName(1)} 2030")
     }
 }
