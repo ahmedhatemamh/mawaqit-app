@@ -2,6 +2,15 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-25 15:14 (Cairo) - سجل القرارات وقاعدة CodeRabbit اندمجوا (PR رقم 12 و13 في mawaqit-app)
+
+- PR #12 (b088de3): `.coderabbit.yaml` (المراجعة التلقائية مقفولة) وقاعدة 62 دقيقة في `CLAUDE.md` و`docs/standing-rules.md`. اتأكد على GitHub: CodeRabbit رد «Review skipped، Auto reviews are disabled» على نفس الـPR.
+- PR #13 (a6f354f): سجل القرارات (DEC-001 لـ DEC-033) والخبير decision-auditor والهوك وفحص decision-link. أحمد دمجهم بنفسه (ملفات حماية). فحص decision-link اتجرّب على GitHub: نجح مع السطر، وفشل لما شلت السطر من الوصف مؤقتًا، ونجح بعد الإرجاع.
+- DEC-005 اتحسم: أيام مراجعة الهجري 28 و29 و30 و1 و2 و3 (DEC-033). جدولة الأيام في mawaqit-data لسه ما اتفحصتش.
+- أيقونة التطبيق «أ» (DEC-030). باقي التصميمات لسه.
+- الجاي: 10ب2 (الجدولة والإشعارات) على فرع جديد؛ أقرب طلب CodeRabbit مش قبل 13:56 UTC.
+- بانتظار أحمد: تصميماته، ردود ESA وNRIAG.
+
 ## 2026-11-25 14:58 (Cairo) - المرحلة 10، الجزء ب1: حفظ التنبيهات اندمج (PR رقم 11 في mawaqit-app)
 
 - اندمج squash في main (bf26795). قبل الدمج: build وemulator خضرا على آخر commit (cf6c33f)، ومراجعة CodeRabbit الأخيرة (12:54 UTC) خلصت من غير تعليقات، والـ4 threads كلها resolved (قريتها بنفسي بـ get_review_comments).
