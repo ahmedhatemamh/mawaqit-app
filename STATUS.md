@@ -2,6 +2,17 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
+## 2026-11-25 17:52 (Cairo) - PR #17 (10ب2: جدولة التنبيهات) مفتوح بعد مراجعة الخبراء الثلاثة، بانتظار الفحوصات ومراجعة CodeRabbit
+
+- PR #17 على `feat/alerts-scheduling` (مفتوح، مش مدموج، وفيه سطر «القرار المرتبط: DEC-023 وDEC-035»). الجلسة اشتركت في نشاطه.
+- الخبراء الأربعة اتحمّلوا في الجلسة دي (مفيش `not found`). استدعيت 3 قبل فتح الـPR والتسجيل في `docs/agents-log.md`: `alarm-reliability-auditor` (22 بند مرقم؛ 4 عيوب حقيقية اتصلحت في `8d687bc`: تنبيهين على نفس الدقيقة، قاعدة بعد أكتر من 14 يوم، فشل التخطيط يمنع العرض، مفيش إعادة جدولة عند منح المنبه الدقيق)، `android-test-auditor` (4 تحسينات اختبار في `aa7fcfe`)، `privacy-security-auditor` (0 عيوب كود).
+- الاختبارات محليًا: `:engine:test` 76، `:app:testDebugUnitTest` 160، 0 فشل؛ `lintDebug` 0 أخطاء؛ `assembleDebug` و`compileDebugAndroidTestKotlin` نجحوا. `AlertsOnDeviceTest` ما اتشغلش (CI فقط).
+- **لم يُتحقق**: `dumpsys alarm` على API 34 (بيحدد نجاح اختبار المنبه)، Doze على جهاز حقيقي، سياسة Google Play لـ`SCHEDULE_EXACT_ALARM`، استلام `TIME_SET` على كل الإصدارات.
+- **أثر معروف**: طلب إذن الإشعارات مؤجل لـ10ج بقرار 3أ، فعلى أندرويد 13+ الإشعارات مش هتظهر على الموبايل قبله.
+- المراجعة الثانية المستقلة (DEC-035): CodeRabbit، لسه ما اتطلبتش (تنتظر خضرة build وemulator وdecision-link). رد «Review skipped» التلقائي على الـPR متوقع.
+- قرارات مفتوحة لأحمد: الصامت و«عدم الإزعاج» مع `CATEGORY_ALARM`، تنبيه فات والموبايل مقفول، قراءة فاشلة مؤقتة تلغي المنبه، `SCHEDULE_EXACT_ALARM` مقابل `USE_EXACT_ALARM` قبل النشر، تصدير `RescheduleReceiver`، سياسة الخصوصية، ومسح فروع #14 و#15 و#16.
+- درس جديد: عدد نقاط الخبراء بيتعدّ مش بيتقدّر (`docs/lessons-learned.md`).
+
 ## 2026-11-25 17:28 (Cairo) - تسليم لجلسة جديدة: 10ب2 (الجدولة والإشعارات) مكتوب ومدفوع من غير PR، وبانتظار الخبير
 
 **اقرا ده الأول في الجلسة الجديدة.**
