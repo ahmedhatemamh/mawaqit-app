@@ -28,7 +28,7 @@ class AlertsOnDeviceTest {
     private val context = instrumentation.targetContext
     private val notifications = context.getSystemService(NotificationManager::class.java)
 
-    // A made-up alert: nothing here depends on today's date or on the bundled data.
+    // A made-up alert with a fixed time. The receiver also plans the next alert from the phone's own (empty, on a fresh test device) stores.
     private val alert = FiredAlert("device-test", AlertKind.ALARM, AlertTarget.ASR, AlertRole.BEFORE, -30, Question.DHUHR, 1_000L)
 
     @Before

@@ -150,4 +150,26 @@ class AlertSchedulerTest {
         assertEquals(asr(far).minusSeconds(30 * 60), backend.scheduled.single().second)
         assertEquals(0, backend.cancels)
     }
+
+    @Test
+    fun theLimitsOfTheOffsetAreEnforcedWhenPlanning() {
+        for (offset in listOf(-180, 0, 180)) {
+            val backend = FakeBackend()
+            assertTrue("offset $offset is allowed", plan(backend, listOf(rule(offset = offset))) is Plan.Scheduled)
+        }
+        for (offset in listOf(-181, 181)) {
+            val backend = FakeBackend()
+            assertEquals("offset $offset is refused", Plan.None, plan(backend, listOf(rule(offset = offset))))
+            assertTrue(backend.scheduled.isEmpty())
+        }
+    }
+
+    @Test
+    fun aOneDayRuleInThePastCancelsThePendingAlarm() {
+        val past = AlertRule("old", AlertKind.REMINDER, setOf(AlertTarget.ASR), -30, recurrence = work.ahmedhatem.mawaqit.engine.alerts.Recurrence.Once(day.minusDays(3)))
+        val backend = FakeBackend()
+        assertEquals(Plan.None, plan(backend, listOf(past)))
+        assertEquals(1, backend.cancels)
+        assertTrue(backend.scheduled.isEmpty())
+    }
 }

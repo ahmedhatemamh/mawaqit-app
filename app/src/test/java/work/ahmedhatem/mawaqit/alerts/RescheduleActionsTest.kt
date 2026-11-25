@@ -9,7 +9,10 @@ class RescheduleActionsTest {
     private val manifest = File("src/main/AndroidManifest.xml").readText()
 
     private fun actionsOfRescheduleReceiver(): Set<String> {
-        val receiver = manifest.substringAfter("android:name=\".alerts.RescheduleReceiver\"").substringBefore("</receiver>")
+        val marker = "android:name=\".alerts.RescheduleReceiver\""
+        val start = manifest.indexOf(marker)
+        check(start >= 0) { "RescheduleReceiver is not declared in the manifest" }
+        val receiver = manifest.substring(start).substringBefore("</receiver>")
         return Regex("<action android:name=\"([^\"]+)\"").findAll(receiver).map { it.groupValues[1] }.toSet()
     }
 
