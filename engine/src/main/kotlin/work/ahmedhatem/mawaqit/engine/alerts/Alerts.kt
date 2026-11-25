@@ -72,6 +72,8 @@ data class AlertRule(
 }
 
 enum class RuleProblem {
+    /** The id is empty (it names the alert on the phone). */
+    EMPTY_ID,
     NO_TARGETS,
     OFFSET_OUT_OF_RANGE,
     REMINDER_MUST_BE_BEFORE,
@@ -104,6 +106,7 @@ object AlertRules {
         val seen = HashSet<String>()
         for ((index, rule) in rules.withIndex()) {
             fun add(problem: RuleProblem) { errors += index to problem }
+            if (rule.id.isEmpty()) add(RuleProblem.EMPTY_ID)
             if (!seen.add(rule.id)) add(RuleProblem.DUPLICATE_ID)
             if (rule.targets.isEmpty()) add(RuleProblem.NO_TARGETS)
             if (rule.offsetMinutes !in -AlertRule.MAX_MINUTES..AlertRule.MAX_MINUTES) add(RuleProblem.OFFSET_OUT_OF_RANGE)
