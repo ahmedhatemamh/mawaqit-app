@@ -121,6 +121,15 @@ class AlertPlannerTest {
     }
 
     @Test
+    fun aBrokenRuleDoesNotSwitchOffAValidRuleThatComesBeforeItWithTheSameId() {
+        val valid = rule(id = "r", offset = -30)
+        val brokenSameId = rule(id = "r", offset = -181)
+        val list = upcoming(listOf(valid, brokenSameId), morning, count = 1)
+        assertEquals(1, list.size)
+        assertEquals(instant(day, times(day)[Prayer.ASR] - 30), list.single().at)
+    }
+
+    @Test
     fun anAfterAlertPastTheNextPrayerIsDroppedForThatDay() {
         val asr = times(day)[Prayer.ASR]
         val maghrib = times(day)[Prayer.MAGHRIB]

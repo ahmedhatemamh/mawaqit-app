@@ -53,8 +53,8 @@ object AlertPlanner {
         maxDays: Int = 14,
     ): List<Occurrence> {
         require(count > 0 && maxDays > 0)
-        val broken = AlertRules.problems(rules).map { it.ruleId }.toSet()
-        val live = rules.filter { it.enabled && it.id !in broken }
+        val broken = AlertRules.problemsByIndex(rules).map { it.first }.toSet()
+        val live = rules.filterIndexed { i, rule -> rule.enabled && i !in broken }
         if (live.isEmpty()) return emptyList()
         val first = EgyptClock.localDateTime(from).toLocalDate().minusDays(1)
         val found = mutableListOf<Occurrence>()

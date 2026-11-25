@@ -86,6 +86,13 @@ class AlertRulesTest {
     }
 
     @Test
+    fun aRepeatedIdIsRefusedOnTheLaterRuleOnly() {
+        val errors = problems(rule("same", -10), rule("other", -20), rule("same", -30))
+        assertEquals(listOf(RuleError("same", RuleProblem.DUPLICATE_ID)), errors)
+        assertEquals(listOf(1 to RuleProblem.DUPLICATE_ID), AlertRules.problemsByIndex(listOf(rule("x", -10), rule("x", -20))))
+    }
+
+    @Test
     fun recurrenceCoversTheRightDays() {
         val d = LocalDate.of(2026, 11, 25)
         assertTrue(Recurrence.Daily.covers(d))

@@ -78,6 +78,9 @@ enum class RuleProblem {
     BAD_DATE_RANGE,
     BAD_REPEAT,
 
+    /** Another rule earlier in the list has the same id (ids name the alert on the phone, so each must be unique). */
+    DUPLICATE_ID,
+
     /** More than three alerts of one kind before the same time. */
     TOO_MANY_BEFORE,
 
@@ -92,11 +95,16 @@ object AlertRules {
      * Every problem in [rules], in list order. A target counts its rules in order: the rule that makes the fourth alert
      * of one kind on one side of one time is the one reported (a disabled rule still holds its place).
      */
-    fun problems(rules: List<AlertRule>): List<RuleError> {
-        val errors = mutableListOf<RuleError>()
+    fun problems(rules: List<AlertRule>): List<RuleError> = problemsByIndex(rules).map { (i, p) -> RuleError(rules[i].id, p) }
+
+    /** The same problems, with the position of the rule in [rules] instead of its id, so a rule can be told from one that shares its id. */
+    fun problemsByIndex(rules: List<AlertRule>): List<Pair<Int, RuleProblem>> {
+        val errors = mutableListOf<Pair<Int, RuleProblem>>()
         val counts = HashMap<Triple<AlertTarget, AlertKind, AlertRole>, Int>()
-        for (rule in rules) {
-            fun add(problem: RuleProblem) { errors += RuleError(rule.id, problem) }
+        val seen = HashSet<String>()
+        for ((index, rule) in rules.withIndex()) {
+            fun add(problem: RuleProblem) { errors += index to problem }
+            if (!seen.add(rule.id)) add(RuleProblem.DUPLICATE_ID)
             if (rule.targets.isEmpty()) add(RuleProblem.NO_TARGETS)
             if (rule.offsetMinutes !in -AlertRule.MAX_MINUTES..AlertRule.MAX_MINUTES) add(RuleProblem.OFFSET_OUT_OF_RANGE)
             if (rule.kind == AlertKind.REMINDER && rule.offsetMinutes >= 0) add(RuleProblem.REMINDER_MUST_BE_BEFORE)
