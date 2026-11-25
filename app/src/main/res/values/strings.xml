@@ -41,4 +41,21 @@
     <string name="year_next_year">السنة التالية</string>
     <string name="year_today">هذا الشهر</string>
     <string name="year_dst_unconfirmed">غير مؤكد: قاعدة التوقيت الصيفي لهذه السنة لم تُعلن بعد</string>
+
+    <string name="search_open">بحث بتاريخ</string>
+    <string name="search_today">النهارده</string>
+    <string name="search_title">ابحث بتاريخ أو سنة</string>
+    <string name="search_gregorian">ميلادي</string>
+    <string name="search_hijri">هجري</string>
+    <string name="search_day">اليوم</string>
+    <string name="search_month">الشهر</string>
+    <string name="search_year">السنة</string>
+    <string name="search_hint">اكتب السنة وحدها لعرض جدولها، أو السنة والشهر لعرض الشهر، أو التاريخ كاملًا لعرض اليوم.</string>
+    <string name="search_go">اعرض</string>
+    <string name="search_error_year">اكتب السنة.</string>
+    <string name="search_error_day_without_month">اكتب الشهر مع اليوم.</string>
+    <string name="search_error_number">اكتب أرقامًا فقط.</string>
+    <string name="search_error_month">الشهر لازم يكون من 1 إلى 12.</string>
+    <string name="search_error_day">هذا اليوم غير موجود في هذا الشهر.</string>
+    <string name="search_error_range">السنة خارج المدى المدعوم (من 1950 إلى 2100 ميلادي).</string>
 </resources>

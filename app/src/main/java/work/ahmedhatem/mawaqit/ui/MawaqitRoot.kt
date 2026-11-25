@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -35,6 +36,7 @@ import work.ahmedhatem.mawaqit.R
 import work.ahmedhatem.mawaqit.engine.EgyptClock
 import work.ahmedhatem.mawaqit.engine.HijriCalendar
 import work.ahmedhatem.mawaqit.hijri.HijriStore
+import work.ahmedhatem.mawaqit.search.SearchResult
 import work.ahmedhatem.mawaqit.settings.Settings
 import work.ahmedhatem.mawaqit.settings.SettingsStore
 import work.ahmedhatem.mawaqit.today.TodayModel
@@ -66,6 +68,13 @@ internal fun dataAgeDays(lastSuccessMillis: Long?, nowMillis: Long): Int? {
 @Composable
 fun MawaqitRoot(store: SettingsStore, hijriStore: HijriStore) {
     var tab by rememberSaveable { mutableStateOf(Tab.TODAY) }
+    // A day chosen by the search (as an epoch day), or null for the live day.
+    var chosenDay by rememberSaveable { mutableStateOf<Long?>(null) }
+    var searching by rememberSaveable { mutableStateOf(false) }
+    var yearMonth by rememberSaveable {
+        val today = EgyptClock.localDateTime(java.time.Instant.now()).toLocalDate()
+        mutableIntStateOf(today.year * 12 + today.monthValue - 1)
+    }
     val settings: Settings? by store.settings.collectAsState(initial = null)
     val now by rememberNow()
     val calendar by produceState<HijriCalendar?>(null) {
@@ -98,14 +107,39 @@ fun MawaqitRoot(store: SettingsStore, hijriStore: HijriStore) {
         }
         val scroll = Modifier.padding(padding).verticalScroll(rememberScrollState())
         when (tab) {
-            Tab.TODAY -> TodayScreen(
-                model = remember(now, current, hijri) { TodayModel.build(now, current, hijri) },
-                dataAgeDays = dataAgeDays(syncState?.lastSuccessMillis, now.toEpochMilli()),
-                modifier = scroll,
-            )
+            Tab.TODAY -> {
+                val chosen = chosenDay
+                TodayScreen(
+                    model = remember(now, current, hijri, chosen) {
+                        if (chosen == null) TodayModel.build(now, current, hijri)
+                        else TodayModel.forDate(java.time.LocalDate.ofEpochDay(chosen), current, hijri)
+                    },
+                    dataAgeDays = dataAgeDays(syncState?.lastSuccessMillis, now.toEpochMilli()),
+                    onSearch = { searching = true },
+                    onBackToToday = if (chosen == null) null else ({ chosenDay = null }),
+                    modifier = scroll,
+                )
+            }
             // The year table scrolls by itself (a list), so it must not sit inside the scrolling column of the other tabs.
-            Tab.YEAR -> YearScreen(current.place, hijri, EgyptClock.localDateTime(now).toLocalDate(), Modifier.padding(padding))
+            Tab.YEAR -> YearScreen(
+                current.place, hijri, EgyptClock.localDateTime(now).toLocalDate(),
+                monthIndex = yearMonth, onMonthIndex = { yearMonth = it }, modifier = Modifier.padding(padding),
+            )
             Tab.SETTINGS -> SettingsScreen(current, store, scroll)
+        }
+        if (searching) {
+            DateSearchDialog(
+                calendar = hijri,
+                onResult = { result ->
+                    searching = false
+                    when (result) {
+                        is SearchResult.Day -> { chosenDay = result.date.toEpochDay(); tab = Tab.TODAY }
+                        is SearchResult.Month -> { yearMonth = result.month.year * 12 + result.month.monthValue - 1; tab = Tab.YEAR }
+                        is SearchResult.Invalid -> Unit
+                    }
+                },
+                onDismiss = { searching = false },
+            )
         }
     }
 }

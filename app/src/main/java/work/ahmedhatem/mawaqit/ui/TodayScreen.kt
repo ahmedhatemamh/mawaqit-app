@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,15 +27,28 @@ import work.ahmedhatem.mawaqit.today.TodayModel
 
 /** The home screen: date, next time with its countdown, and the six times of the day. */
 @Composable
-fun TodayScreen(model: TodayModel, dataAgeDays: Int?, modifier: Modifier = Modifier) {
+fun TodayScreen(
+    model: TodayModel,
+    dataAgeDays: Int?,
+    onSearch: () -> Unit,
+    /** Set when a chosen day (not the live one) is shown: the button that goes back to today. */
+    onBackToToday: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
             text = stringResource(R.string.today_title),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary,
         )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            OutlinedButton(onClick = onSearch, modifier = Modifier.testTag("search_open")) { Text(stringResource(R.string.search_open)) }
+            if (onBackToToday != null) {
+                Button(onClick = onBackToToday, modifier = Modifier.testTag("back_to_today")) { Text(stringResource(R.string.search_today)) }
+            }
+        }
         DateBlock(model)
-        NextBlock(model)
+        model.next?.let { NextBlock(model, it) }
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))) {
             Column(Modifier.padding(vertical = 4.dp)) {
                 for (row in model.rows) {
@@ -100,19 +115,19 @@ private fun DateBlock(model: TodayModel) {
 }
 
 @Composable
-private fun NextBlock(model: TodayModel) {
+private fun NextBlock(model: TodayModel, next: work.ahmedhatem.mawaqit.engine.NextTime) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         modifier = Modifier.fillMaxWidth().testTag("next"),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                text = "${stringResource(R.string.next_label)}: ${model.next.prayer.arabicName}  ${ArabicFormat.time(model.next.minute)}",
+                text = "${stringResource(R.string.next_label)}: ${next.prayer.arabicName}  ${ArabicFormat.time(next.minute)}",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
             )
             Text(
-                text = stringResource(R.string.in_time, ArabicFormat.countdown(model.next.minutesUntil)),
+                text = stringResource(R.string.in_time, ArabicFormat.countdown(next.minutesUntil)),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.testTag("countdown"),

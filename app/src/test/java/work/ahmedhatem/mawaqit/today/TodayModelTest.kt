@@ -5,6 +5,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import work.ahmedhatem.mawaqit.engine.CityFinder
@@ -26,7 +27,7 @@ class TodayModelTest {
         assertEquals(6, m.rows.size)
         assertEquals(Prayer.entries, m.rows.map { it.prayer })
         assertEquals(listOf(Prayer.ASR), m.rows.filter { it.isNext }.map { it.prayer })
-        assertEquals(m.next.prayer, Prayer.ASR)
+        assertEquals(m.next!!.prayer, Prayer.ASR)
         assertEquals(m.rows.map { it.minute }.sorted(), m.rows.map { it.minute })
         assertEquals("القاهرة", m.placeLabel)
         assertTrue(m.dstConfirmed)
@@ -36,8 +37,8 @@ class TodayModelTest {
     fun afterIshaNothingIsHighlightedAndTheNextIsTomorrowsFajr() {
         val m = build(LocalDateTime.of(2026, 11, 25, 23, 0))
         assertTrue(m.rows.none { it.isNext })
-        assertEquals(Prayer.FAJR, m.next.prayer)
-        assertEquals(LocalDate.of(2026, 11, 26), m.next.date)
+        assertEquals(Prayer.FAJR, m.next!!.prayer)
+        assertEquals(LocalDate.of(2026, 11, 26), m.next!!.date)
     }
 
     @Test
@@ -96,7 +97,7 @@ class TodayModelTest {
         val after = build(LocalDateTime.of(2026, 11, 26, 0, 0, 0))
         assertEquals(LocalDate.of(2026, 11, 25), before.date)
         assertEquals(LocalDate.of(2026, 11, 26), after.date)
-        assertEquals(Prayer.FAJR, after.next.prayer)
+        assertEquals(Prayer.FAJR, after.next!!.prayer)
         assertTrue(after.rows.first().isNext)
     }
 
@@ -108,5 +109,27 @@ class TodayModelTest {
         assertEquals(31, dataAgeDays(0, 31 * day))
         assertEquals(100, dataAgeDays(0, 100 * day))
         assertEquals(null, dataAgeDays(10 * day, 0))   // the clock went back
+    }
+
+    @Test
+    fun aChosenDayHasNoCountdownAndNothingHighlighted() {
+        val m = TodayModel.forDate(LocalDate.of(2025, 3, 1), settings, calendar)
+        assertNull(m.next)
+        assertTrue(m.rows.none { it.isNext })
+        assertEquals(6, m.rows.size)
+        assertEquals(1, m.hijri.day)
+        assertEquals(9, m.hijri.month)
+        assertEquals(1446, m.hijri.year)
+    }
+
+    @Test
+    fun countdownAcrossTheRepeatedOctoberHourUsesRealElapsedTime() {
+        // 2026-10-29 is the last Thursday of October: clocks go back at 24:00 -> 23:00 local, so that hour happens twice.
+        val before = Instant.parse("2026-10-29T20:30:00Z") // 23:30 summer time, first pass
+        val m = TodayModel.build(before, settings, calendar)
+        val n = m.next!!
+        val target = work.ahmedhatem.mawaqit.engine.EgyptClock.toInstant(n.date.atStartOfDay().plusMinutes(n.minute.toLong()))
+        assertEquals(Prayer.FAJR, n.prayer)
+        assertEquals(java.time.Duration.between(before, target).seconds, n.secondsUntil.toLong())
     }
 }
