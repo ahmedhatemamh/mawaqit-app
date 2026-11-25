@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import work.ahmedhatem.mawaqit.R
+import work.ahmedhatem.mawaqit.engine.EgyptClock
 import work.ahmedhatem.mawaqit.engine.HijriCalendar
 import work.ahmedhatem.mawaqit.hijri.HijriStore
 import work.ahmedhatem.mawaqit.settings.Settings
@@ -39,6 +41,7 @@ import work.ahmedhatem.mawaqit.today.TodayModel
 
 private enum class Tab(val label: Int, val icon: ImageVector) {
     TODAY(R.string.tab_today, Icons.Filled.Home),
+    YEAR(R.string.tab_year, Icons.Filled.DateRange),
     SETTINGS(R.string.tab_settings, Icons.Filled.Settings),
 }
 
@@ -100,6 +103,8 @@ fun MawaqitRoot(store: SettingsStore, hijriStore: HijriStore) {
                 dataAgeDays = dataAgeDays(syncState?.lastSuccessMillis, now.toEpochMilli()),
                 modifier = scroll,
             )
+            // The year table scrolls by itself (a list), so it must not sit inside the scrolling column of the other tabs.
+            Tab.YEAR -> YearScreen(current.place, hijri, EgyptClock.localDateTime(now).toLocalDate(), Modifier.padding(padding))
             Tab.SETTINGS -> SettingsScreen(current, store, scroll)
         }
     }

@@ -26,6 +26,8 @@ object ArabicFormat {
 
     fun weekday(date: LocalDate): String = WEEKDAYS.getValue(date.dayOfWeek)
 
+    fun gregorianMonthName(month: Int): String = GREGORIAN_MONTHS[month - 1]
+
     fun gregorian(date: LocalDate): String = "${date.dayOfMonth} ${GREGORIAN_MONTHS[date.monthValue - 1]} ${date.year}"
 
     fun hijriMonthName(month: Int): String = HIJRI_MONTHS[month - 1]
