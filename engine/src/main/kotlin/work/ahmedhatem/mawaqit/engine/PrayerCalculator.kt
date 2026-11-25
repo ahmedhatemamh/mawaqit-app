@@ -43,10 +43,14 @@ object PrayerCalculator {
     private const val MIN_LONGITUDE = 24.0
     private const val MAX_LONGITUDE = 37.5
 
+    /** Whether a point is inside the area the calculation accepts (Egypt with a small margin). */
+    fun isInsideEgypt(latitude: Double, longitude: Double): Boolean =
+        latitude in MIN_LATITUDE..MAX_LATITUDE && longitude in MIN_LONGITUDE..MAX_LONGITUDE
+
     fun timesFor(date: LocalDate, city: City): DayTimes = timesFor(date, city.latitude, city.longitude)
 
     fun timesFor(date: LocalDate, latitude: Double, longitude: Double): DayTimes {
-        require(latitude in MIN_LATITUDE..MAX_LATITUDE && longitude in MIN_LONGITUDE..MAX_LONGITUDE) {
+        require(isInsideEgypt(latitude, longitude)) {
             "coordinates are outside Egypt: $latitude, $longitude"
         }
         val offset = EgyptDst.offsetFor(date)
