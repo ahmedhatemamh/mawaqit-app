@@ -64,4 +64,28 @@ class AlertTextsTest {
         )
         for ((n, words) in expected) assertEquals("$n", words, AlertTexts.minutes(n))
     }
+
+    private val plannedAt = 1_000_000_000_000L
+    private fun alertAt(role: AlertRole, offset: Int) = FiredAlert("r", AlertKind.ALARM, AlertTarget.ASR, role, offset, if (role == AlertRole.BEFORE) Question.DHUHR else null, plannedAt)
+    private fun shown(a: FiredAlert, secondsLate: Long) = AlertTexts.of(a, java.time.Instant.ofEpochMilli(a.atMillis + secondsLate * 1000)).body
+
+    @Test
+    fun minutesAreCountedFromTheMomentOfShowingNotFromPlanning() {
+        val before = alertAt(AlertRole.BEFORE, -29)
+        assertEquals("صلاة العصر بعد 29 دقيقة", shown(before, 0))
+        assertEquals("صلاة العصر بعد 29 دقيقة", shown(before, 20)) // a few seconds late is still 29
+        assertEquals("صلاة العصر بعد 24 دقيقة", shown(before, 5 * 60))
+        assertEquals("حان وقت صلاة العصر", shown(before, 29 * 60)) // delivered at the time itself
+        assertEquals("حان وقت صلاة العصر", shown(before, 40 * 60)) // delivered after it
+    }
+
+    @Test
+    fun afterTheTimeTheMinutesPassedGrowWithTheDelay() {
+        val after = alertAt(AlertRole.AFTER, 10)
+        assertEquals("مر 10 دقائق على صلاة العصر", shown(after, 0))
+        assertEquals("مر 15 دقيقة على صلاة العصر", shown(after, 5 * 60))
+        val atTime = alertAt(AlertRole.AFTER, 0)
+        assertEquals("حان وقت صلاة العصر", shown(atTime, 0))
+        assertEquals("مر 5 دقائق على صلاة العصر", shown(atTime, 5 * 60))
+    }
 }

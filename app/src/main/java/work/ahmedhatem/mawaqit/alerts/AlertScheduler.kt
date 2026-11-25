@@ -45,15 +45,22 @@ class AlertScheduler(private val backend: AlarmBackend) {
     }
 
     /**
-     * The other alerts due at the very minute of [fired] (the alarm clock holds one entry, so a reminder and an alarm
-     * set for the same time arrive together and the receiver shows them all). Answers given since then are respected.
+     * The other alerts due together with [fired]: those at its minute, and (when the alarm came late) those that fell
+     * due before [until], the moment it was delivered, since the one alarm clock entry could not tell about them.
+     * Answers given since then are respected.
      */
-    fun companionsOf(fired: FiredAlert, rules: List<AlertRule>, settings: Settings, prayed: Set<Pair<LocalDate, Prayer>>): List<FiredAlert> {
+    fun companionsOf(
+        fired: FiredAlert,
+        rules: List<AlertRule>,
+        settings: Settings,
+        prayed: Set<Pair<LocalDate, Prayer>>,
+        until: Instant = Instant.ofEpochMilli(fired.atMillis),
+    ): List<FiredAlert> {
         val at = Instant.ofEpochMilli(fired.atMillis)
         return AlertPlanner.upcoming(
             rules, at.minusSeconds(1), MAX_SIMULTANEOUS, settings.place.latitude, settings.place.longitude,
             settings.makruhMinutes, prayed, NEAR_LOOK_AHEAD_DAYS,
-        ).filter { it.at == at && !(it.ruleId == fired.ruleId && it.target == fired.target) }.map { FiredAlert.of(it) }
+        ).filter { it.at <= maxOf(at, until) && !(it.ruleId == fired.ruleId && it.target == fired.target) }.map { FiredAlert.of(it) }
     }
 
     private fun nextOccurrence(rules: List<AlertRule>, settings: Settings, prayed: Set<Pair<LocalDate, Prayer>>, now: Instant, maxDays: Int) =
@@ -61,11 +68,20 @@ class AlertScheduler(private val backend: AlarmBackend) {
             rules, now, 1, settings.place.latitude, settings.place.longitude, settings.makruhMinutes, prayed, maxDays,
         ).firstOrNull()
 
-    private companion object {
-        const val FAR_LOOK_AHEAD_DAYS = 400
-        const val NEAR_LOOK_AHEAD_DAYS = 2
+    companion object {
+        /** A shown alert stays at least this long, even when the next prayer is very near. */
+        const val MIN_VISIBLE_MINUTES = 15L
+
+        /** An alert shown at [shownAt] disappears at the next prayer time, but not before [MIN_VISIBLE_MINUTES]. */
+        fun expiryAfter(shownAt: Instant, settings: Settings): Instant = maxOf(
+            AlertPlanner.nextDailyTimeAfter(shownAt, settings.place.latitude, settings.place.longitude),
+            shownAt.plusSeconds(MIN_VISIBLE_MINUTES * 60),
+        )
+
+        private const val FAR_LOOK_AHEAD_DAYS = 400
+        private const val NEAR_LOOK_AHEAD_DAYS = 2
 
         /** More than the rules can ever put on one minute (3 per kind and side for each of the 7 times). */
-        const val MAX_SIMULTANEOUS = 100
+        private const val MAX_SIMULTANEOUS = 100
     }
 }

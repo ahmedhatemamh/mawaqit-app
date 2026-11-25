@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import java.time.Duration
+import java.time.Instant
 import work.ahmedhatem.mawaqit.R
 import work.ahmedhatem.mawaqit.engine.alerts.AlertKind
 
@@ -32,11 +34,15 @@ object AlertNotifications {
         )
     }
 
-    /** False (nothing shown) when the user has not allowed notifications: the caller reports it, it is not hidden. */
-    fun show(context: Context, alert: FiredAlert): Boolean {
+    /**
+     * False (nothing shown) when the user has not allowed notifications: the caller reports it, it is not hidden.
+     * [now] is the moment of showing (the words count minutes from it); the notification disappears by itself at
+     * [expiresAt] when given, so old ones can never pile up to the phone's limit of notifications per app.
+     */
+    fun show(context: Context, alert: FiredAlert, now: Instant = Instant.now(), expiresAt: Instant? = null): Boolean {
         val manager = NotificationManagerCompat.from(context)
         if (!manager.areNotificationsEnabled()) return false
-        val text = AlertTexts.of(alert)
+        val text = AlertTexts.of(alert, now)
         val alarm = alert.kind == AlertKind.ALARM
         val notification = NotificationCompat.Builder(context, if (alarm) ALARMS else REMINDERS)
             .setSmallIcon(R.drawable.ic_notification)
@@ -45,6 +51,7 @@ object AlertNotifications {
             .setCategory(if (alarm) Notification.CATEGORY_ALARM else Notification.CATEGORY_REMINDER)
             .setPriority(if (alarm) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .apply { expiresAt?.let { setTimeoutAfter(Duration.between(now, it).toMillis().coerceAtLeast(1)) } }
             .build()
         @Suppress("MissingPermission") // checked above with areNotificationsEnabled()
         manager.notify(notificationId(alert), notification)

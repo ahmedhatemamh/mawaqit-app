@@ -3,6 +3,7 @@ package work.ahmedhatem.mawaqit.alerts
 import android.Manifest
 import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -28,12 +29,15 @@ class AlertsOnDeviceTest {
     private val context = instrumentation.targetContext
     private val notifications = context.getSystemService(NotificationManager::class.java)
 
-    // A made-up alert with a fixed time. The receiver also plans the next alert from the phone's own (empty, on a fresh test device) stores.
-    private val alert = FiredAlert("device-test", AlertKind.ALARM, AlertTarget.ASR, AlertRole.BEFORE, -30, Question.DHUHR, 1_000L)
+    // A made-up alert due now: the words count minutes from the moment of showing, so a fixed old time would read "overdue".
+    // The receiver also plans the next alert from the phone's own (empty, on a fresh test device) stores.
+    private val alert = FiredAlert("device-test", AlertKind.ALARM, AlertTarget.ASR, AlertRole.BEFORE, -30, Question.DHUHR, System.currentTimeMillis())
 
     @Before
     fun allowNotifications() {
-        instrumentation.uiAutomation.grantRuntimePermission(context.packageName, Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            instrumentation.uiAutomation.grantRuntimePermission(context.packageName, Manifest.permission.POST_NOTIFICATIONS)
+        }
         AlertNotifications.createChannels(context)
     }
 

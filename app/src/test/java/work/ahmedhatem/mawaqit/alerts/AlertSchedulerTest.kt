@@ -172,4 +172,43 @@ class AlertSchedulerTest {
         assertEquals(1, backend.cancels)
         assertTrue(backend.scheduled.isEmpty())
     }
+
+    private fun at(day: LocalDate, prayer: Prayer): Instant {
+        val minute = PrayerCalculator.timesFor(day, settings.place.latitude, settings.place.longitude)[prayer]
+        return EgyptClock.toInstant(day.atStartOfDay().plusMinutes(minute.toLong()))
+    }
+
+    @Test
+    fun alertsThatFellDueWhileTheAlarmWasLateAreShownToo() {
+        val rules = listOf(rule("first", offset = -30, kind = AlertKind.REMINDER), rule("second", offset = -29, kind = AlertKind.REMINDER))
+        val backend = FakeBackend()
+        plan(backend, rules)
+        val first = backend.scheduled.single().first
+        assertEquals("first", first.ruleId)
+        val scheduler = AlertScheduler(backend)
+        // On time: only the alert itself.
+        assertTrue(scheduler.companionsOf(first, rules, settings, emptySet()).isEmpty())
+        // Delivered five minutes late: the alert due one minute after it is not lost.
+        val late = Instant.ofEpochMilli(first.atMillis).plusSeconds(5 * 60)
+        assertEquals(listOf("second"), scheduler.companionsOf(first, rules, settings, emptySet(), late).map { it.ruleId })
+        // Not yet due at delivery time: not shown (it is planned as the next alarm instead).
+        val early = Instant.ofEpochMilli(first.atMillis).plusSeconds(30)
+        assertTrue(scheduler.companionsOf(first, rules, settings, emptySet(), early).isEmpty())
+    }
+
+    @Test
+    fun aShownAlertDisappearsAtTheNextPrayerTime() {
+        val shownAt = at(day, Prayer.ASR).minusSeconds(60 * 60)
+        assertEquals(at(day, Prayer.ASR), AlertScheduler.expiryAfter(shownAt, settings))
+        // After Isha the next prayer is tomorrow's Fajr.
+        val night = at(day, Prayer.ISHA).plusSeconds(60 * 60)
+        assertEquals(at(day.plusDays(1), Prayer.FAJR), AlertScheduler.expiryAfter(night, settings))
+    }
+
+    @Test
+    fun aShownAlertNeverDisappearsBeforeTheMinimumEvenWhenThePrayerIsNear() {
+        val shownAt = at(day, Prayer.ASR).minusSeconds(60)
+        assertEquals(shownAt.plusSeconds(AlertScheduler.MIN_VISIBLE_MINUTES * 60), AlertScheduler.expiryAfter(shownAt, settings))
+        assertEquals(15L, AlertScheduler.MIN_VISIBLE_MINUTES)
+    }
 }

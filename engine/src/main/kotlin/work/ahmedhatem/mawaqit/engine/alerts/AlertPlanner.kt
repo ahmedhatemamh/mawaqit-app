@@ -78,6 +78,20 @@ object AlertPlanner {
         return found.sortedWith(compareBy({ it.at }, { it.ruleId }, { it.target })).take(count)
     }
 
+    /** The next of the six daily times (Fajr to Isha) strictly after [at]: when a shown alert stops being useful. */
+    fun nextDailyTimeAfter(at: Instant, latitude: Double, longitude: Double): Instant {
+        val first = EgyptClock.localDateTime(at).toLocalDate()
+        for (i in 0..1) {
+            val date = first.plusDays(i.toLong())
+            val times = PrayerCalculator.timesFor(date, latitude, longitude)
+            for (t in ORDER) {
+                val instant = EgyptClock.toInstant(date.atStartOfDay().plusMinutes(minuteOf(t, times, 0).toLong()))
+                if (instant > at) return instant
+            }
+        }
+        throw IllegalStateException("No daily time found within two days after $at")
+    }
+
     private fun occurrence(
         rule: AlertRule,
         target: AlertTarget,
