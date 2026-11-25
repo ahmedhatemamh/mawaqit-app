@@ -46,24 +46,31 @@ class AlertsOnDeviceTest {
     private fun shell(command: String): String =
         ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand(command)).bufferedReader().readText()
 
-    private fun ourAlarmPending() = shell("dumpsys alarm").contains(SystemAlarmBackend.ACTION_FIRE)
-
     /**
-     * For a failure message only. CI prints just the first two lines of a failure, so this is one line: each line of
-     * `dumpsys alarm` that names our action, with the chain of headings above it (by indentation), and cancel()'s log.
+     * Every line of `dumpsys alarm` that names our action, with the chain of headings above it (by indentation). A
+     * cancelled alarm stays in the dump under "Removal history" (Reason=alarm_cancelled), so a line only counts as a
+     * pending alarm when no heading above it mentions "history" (seen on CI, API 34).
      */
-    private fun failureDetails(): String {
+    private fun linesNamingOurAction(): List<Pair<List<String>, String>> {
         val chain = mutableListOf<Pair<Int, String>>()
-        val found = mutableListOf<String>()
+        val found = mutableListOf<Pair<List<String>, String>>()
         for (line in shell("dumpsys alarm").lines()) {
             if (line.isBlank()) continue
             val indent = line.length - line.trimStart().length
             while (chain.isNotEmpty() && chain.last().first >= indent) chain.removeAt(chain.size - 1)
-            if (line.contains(SystemAlarmBackend.ACTION_FIRE)) found += chain.joinToString(" > ") { it.second } + " >> " + line.trim()
+            if (line.contains(SystemAlarmBackend.ACTION_FIRE)) found += chain.map { it.second } to line.trim()
             chain += indent to line.trim().take(60)
         }
+        return found
+    }
+
+    private fun ourAlarmPending() = linesNamingOurAction().any { (chain, _) -> chain.none { it.contains("history", ignoreCase = true) } }
+
+    /** For a failure message only. CI prints just the first two lines of a failure, so this is one line. */
+    private fun failureDetails(): String {
+        val lines = linesNamingOurAction().joinToString(" || ") { (chain, line) -> chain.joinToString(" > ") + " >> " + line }
         val log = shell("logcat -d -s AlertAlarm:I").lines().filter { it.isNotBlank() }.takeLast(3)
-        return "dumpsys lines naming our action (${found.size}): ${found.joinToString(" || ")} ## cancel log: ${log.joinToString(" || ")}"
+        return "dumpsys lines naming our action: $lines ## cancel log: ${log.joinToString(" || ")}"
     }
 
     @Test
