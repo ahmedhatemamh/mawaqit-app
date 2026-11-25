@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Decision log reminder: if this message from Ahmed approves, rejects or chooses something, add a DEC entry to docs/decisions-log.md (his exact words, date, reason, rejected options). Every PR body needs the line: القرار المرتبط: DEC-0xx or (لا يوجد: السبب).'"
+            "command": "echo 'Decision log reminder: if this message from Ahmed approves, rejects or chooses something, add a DEC entry to docs/decisions-log.md (his exact words, date, reason, rejected options). Every PR body needs the line: القرار المرتبط: DEC-0xx or (لا يوجد: السبب).'; cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; last=$(git log -1 --format=%ct -- docs/agents-log.md 2>/dev/null); now=$(date +%s); if [ -z \"$last\" ] || [ $((now-last)) -gt 604800 ]; then echo 'Weekly agents-log reminder (docs/agents-log.md not updated in the last 7 days): هل docs/agents-log.md اتحدّث هذا الأسبوع؟ وهل اتستدعى خبير يستحق التسجيل؟'; fi"
           }
         ]
       }
