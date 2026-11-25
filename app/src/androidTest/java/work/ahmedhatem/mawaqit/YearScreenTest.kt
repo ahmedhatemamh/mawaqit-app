@@ -39,9 +39,9 @@ class YearScreenTest {
     }
 
     private fun openYearTab() {
-        rule.waitUntil(timeoutMillis = 10_000) { rule.onAllNodes(hasTestTag("tab_YEAR")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(timeoutMillis = UI_WAIT_MS) { rule.onAllNodes(hasTestTag("tab_YEAR")).fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithTag("tab_YEAR").performClick()
-        rule.waitUntil(timeoutMillis = 10_000) { rule.onAllNodes(hasTestTag("year_title")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(timeoutMillis = UI_WAIT_MS) { rule.onAllNodes(hasTestTag("year_title")).fetchSemanticsNodes().isNotEmpty() }
     }
 
     private fun title(month: YearMonth) = "${ArabicFormat.gregorianMonthName(month.monthValue)} ${month.year}"
