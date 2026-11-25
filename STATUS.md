@@ -2,16 +2,18 @@
 
 Newest entry first. Add new entries at the top using Edit only.
 
-## 2026-11-25 17:52 (Cairo) - PR #17 (10ب2: جدولة التنبيهات) مفتوح بعد مراجعة الخبراء الثلاثة، بانتظار الفحوصات ومراجعة CodeRabbit
+## 2026-11-25 18:2x (Cairo) - PR #17 (10ب2: جدولة التنبيهات): build وemulator وdecision-link خضرا على `7a9175a`، بانتظار مراجعة CodeRabbit
 
-- PR #17 على `feat/alerts-scheduling` (مفتوح، مش مدموج، وفيه سطر «القرار المرتبط: DEC-023 وDEC-035»). الجلسة اشتركت في نشاطه.
-- الخبراء الأربعة اتحمّلوا في الجلسة دي (مفيش `not found`). استدعيت 3 قبل فتح الـPR والتسجيل في `docs/agents-log.md`: `alarm-reliability-auditor` (22 بند مرقم؛ 4 عيوب حقيقية اتصلحت في `8d687bc`: تنبيهين على نفس الدقيقة، قاعدة بعد أكتر من 14 يوم، فشل التخطيط يمنع العرض، مفيش إعادة جدولة عند منح المنبه الدقيق)، `android-test-auditor` (4 تحسينات اختبار في `aa7fcfe`)، `privacy-security-auditor` (0 عيوب كود).
-- الاختبارات محليًا: `:engine:test` 76، `:app:testDebugUnitTest` 160، 0 فشل؛ `lintDebug` 0 أخطاء؛ `assembleDebug` و`compileDebugAndroidTestKotlin` نجحوا. `AlertsOnDeviceTest` ما اتشغلش (CI فقط).
-- **لم يُتحقق**: `dumpsys alarm` على API 34 (بيحدد نجاح اختبار المنبه)، Doze على جهاز حقيقي، سياسة Google Play لـ`SCHEDULE_EXACT_ALARM`، استلام `TIME_SET` على كل الإصدارات.
+- PR #17 على `feat/alerts-scheduling` (مفتوح، مش مدموج، فيه سطر «القرار المرتبط: DEC-023 وDEC-035»). الجلسة مشتركة في نشاطه.
+- الخبراء الأربعة اتحمّلوا (مفيش `not found`). استدعيت 3 قبل فتح الـPR (`docs/agents-log.md`): المنبهات (4 عيوب حقيقية اتصلحت في `8d687bc`)، الاختبارات (4 تحسينات في `aa7fcfe`)، الخصوصية (0 عيوب كود).
+- **فشل `emulator` أول مرتين** (`5bcbb0f` و`6898a2a`): `AlertsOnDeviceTest > theAlarmClockHoldsOneAlarmUntilItIsCancelled`. الدليل من لوج CI: بعد الإلغاء السطر الوحيد اللي فيه اسم الـaction كان تحت `Current Alarm Manager state: > Removal history: > ... Reason=alarm_cancelled`، ولوج `cancel()` قال `pending intent found`. يعني `cancel()` سليم والمنبه اتلغى، والعيب كان في الفحص (بيقرا الـdump كله بما فيه سجل الإزالة). اتضبط في `7a9175a` بحيث يتجاهل العناوين اللي فيها «history» (الشروط الثلاثة كما هي). تحفظ: فلتر سلبي مبني على قسم واحد شفته على API 34.
+- محليًا: `:engine:test` 76، `:app:testDebugUnitTest` 160، 0 فشل؛ lint 0 أخطاء.
+- **لم يُتحقق**: Doze على جهاز حقيقي، سياسة Google Play لـ`SCHEDULE_EXACT_ALARM`، استلام `TIME_SET` على كل الإصدارات.
 - **أثر معروف**: طلب إذن الإشعارات مؤجل لـ10ج بقرار 3أ، فعلى أندرويد 13+ الإشعارات مش هتظهر على الموبايل قبله.
-- المراجعة الثانية المستقلة (DEC-035): CodeRabbit، لسه ما اتطلبتش (تنتظر خضرة build وemulator وdecision-link). رد «Review skipped» التلقائي على الـPR متوقع.
-- قرارات مفتوحة لأحمد: الصامت و«عدم الإزعاج» مع `CATEGORY_ALARM`، تنبيه فات والموبايل مقفول، قراءة فاشلة مؤقتة تلغي المنبه، `SCHEDULE_EXACT_ALARM` مقابل `USE_EXACT_ALARM` قبل النشر، تصدير `RescheduleReceiver`، سياسة الخصوصية، ومسح فروع #14 و#15 و#16.
-- درس جديد: عدد نقاط الخبراء بيتعدّ مش بيتقدّر (`docs/lessons-learned.md`).
+- المراجعة الثانية المستقلة (DEC-035): CodeRabbit، لسه ما اتطلبتش (بعد خضرة الفحوصات على آخر commit). تعليق «Review skipped» التلقائي متوقع.
+- مسح فروع #14 و#15 و#16: بأمر أحمد جربت `git push --delete` فكان الرد `unexpected disconnect` (الفروع التلاتة لسه موجودة، والتلات PRs مدموجين فعلًا). بيتمسحوا بإيد أحمد.
+- قرارات مفتوحة لأحمد: الصامت و«عدم الإزعاج» مع `CATEGORY_ALARM`، تنبيه فات والموبايل مقفول، قراءة فاشلة مؤقتة تلغي المنبه، `SCHEDULE_EXACT_ALARM` مقابل `USE_EXACT_ALARM` قبل النشر، تصدير `RescheduleReceiver`، سياسة الخصوصية.
+- درس: عدد نقاط الخبراء بيتعدّ مش بيتقدّر (`docs/lessons-learned.md`).
 
 ## 2026-11-25 17:28 (Cairo) - تسليم لجلسة جديدة: 10ب2 (الجدولة والإشعارات) مكتوب ومدفوع من غير PR، وبانتظار الخبير
 
