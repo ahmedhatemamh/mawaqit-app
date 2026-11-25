@@ -48,19 +48,23 @@ class AlertsOnDeviceTest {
 
     private fun ourAlarmPending() = shell("dumpsys alarm").contains(SystemAlarmBackend.ACTION_FIRE)
 
-    /** For a failure message only: each line of `dumpsys alarm` that names our action, under the heading of its section. */
-    private fun whereOurActionAppears(): String {
-        var heading = "(top of the output)"
+    /**
+     * For a failure message only. CI prints just the first two lines of a failure, so this is one line: each line of
+     * `dumpsys alarm` that names our action, with the chain of headings above it (by indentation), and cancel()'s log.
+     */
+    private fun failureDetails(): String {
+        val chain = mutableListOf<Pair<Int, String>>()
         val found = mutableListOf<String>()
         for (line in shell("dumpsys alarm").lines()) {
-            if (line.isNotEmpty() && !line[0].isWhitespace()) heading = line.trim()
-            if (line.contains(SystemAlarmBackend.ACTION_FIRE)) found += "[$heading] ${line.trim()}"
+            if (line.isBlank()) continue
+            val indent = line.length - line.trimStart().length
+            while (chain.isNotEmpty() && chain.last().first >= indent) chain.removeAt(chain.size - 1)
+            if (line.contains(SystemAlarmBackend.ACTION_FIRE)) found += chain.joinToString(" > ") { it.second } + " >> " + line.trim()
+            chain += indent to line.trim().take(60)
         }
-        return found.joinToString("\n")
+        val log = shell("logcat -d -s AlertAlarm:I").lines().filter { it.isNotBlank() }.takeLast(3)
+        return "dumpsys lines naming our action (${found.size}): ${found.joinToString(" || ")} ## cancel log: ${log.joinToString(" || ")}"
     }
-
-    /** For a failure message only: what cancel() logged (it found the pending intent or not). */
-    private fun cancelLog() = shell("logcat -d -s AlertAlarm:I")
 
     @Test
     fun bothChannelsExistWithTheRightImportance() {
@@ -77,10 +81,7 @@ class AlertsOnDeviceTest {
         assertEquals(SystemAlarmBackend.canScheduleExact(context), exact)
         assertTrue("the alarm is pending", ourAlarmPending())
         backend.cancel()
-        assertFalse(
-            "the alarm is gone after cancel. dumpsys sections naming our action:\n${whereOurActionAppears()}\ncancel log:\n${cancelLog()}",
-            ourAlarmPending(),
-        )
+        assertFalse("the alarm is gone after cancel. ${failureDetails()}", ourAlarmPending())
     }
 
     @Test
