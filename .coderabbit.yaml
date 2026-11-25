@@ -1,0 +1,6 @@
+# Automatic review is off: the review limit is shared with another repository,
+# so a review runs only when someone asks with "@coderabbitai review".
+reviews:
+  auto_review:
+    enabled: false
+    drafts: false
