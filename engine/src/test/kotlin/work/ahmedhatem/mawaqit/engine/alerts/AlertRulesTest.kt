@@ -86,6 +86,11 @@ class AlertRulesTest {
     }
 
     @Test
+    fun anEmptyIdIsRefused() {
+        assertEquals(listOf(RuleError("", RuleProblem.EMPTY_ID)), problems(rule("")))
+    }
+
+    @Test
     fun aRepeatedIdIsRefusedOnTheLaterRuleOnly() {
         val errors = problems(rule("same", -10), rule("other", -20), rule("same", -30))
         assertEquals(listOf(RuleError("same", RuleProblem.DUPLICATE_ID)), errors)
