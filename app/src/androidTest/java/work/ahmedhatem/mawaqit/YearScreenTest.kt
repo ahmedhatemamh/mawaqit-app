@@ -6,6 +6,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import java.time.YearMonth
@@ -70,6 +71,17 @@ class YearScreenTest {
         rule.onNodeWithTag("year_title").assertTextContains(title(now.minusMonths(1).minusYears(1)))
         rule.onNodeWithTag("year_current").performClick()
         rule.onNodeWithTag("year_title").assertTextContains(title(now))
+    }
+
+    @Test
+    fun aNewMonthOpensOnItsFirstDayEvenAfterScrollingTheOldOne() {
+        openYearTab()
+        val now = YearMonth.from(EgyptClock.localDateTime(java.time.Instant.now()).toLocalDate())
+        rule.onNodeWithTag("year_list").performScrollToIndex(now.lengthOfMonth() - 1)   // the last day of this month
+        val next = now.plusMonths(1)
+        rule.onNodeWithTag("year_next").performClick()
+        rule.onNodeWithTag("year_title").assertTextContains(title(next))
+        rule.onNodeWithTag("day_${next.atDay(1).toEpochDay()}").assertIsDisplayed()
     }
 
     @Test

@@ -55,9 +55,6 @@ fun YearScreen(place: Place, calendar: HijriCalendar, today: LocalDate, modifier
         monthIndex = moved.year * 12 + moved.monthValue - 1
     }
     val table = remember(month, place, calendar) { YearModel.build(month, place, calendar) }
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = if (YearMonth.from(today) == month) today.dayOfMonth - 1 else 0,
-    )
 
     Column(modifier = modifier.padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -97,7 +94,11 @@ fun YearScreen(place: Place, calendar: HijriCalendar, today: LocalDate, modifier
                 modifier = Modifier.testTag("year_dst_unconfirmed"),
             )
         }
+        // A new list state for every month: the current month opens on today, any other month on its first day.
         androidx.compose.runtime.key(month) {
+            val listState = rememberLazyListState(
+                initialFirstVisibleItemIndex = if (YearMonth.from(today) == month) today.dayOfMonth - 1 else 0,
+            )
             LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.testTag("year_list")) {
                 items(table.rows, key = { it.date.toEpochDay() }) { row -> DayCard(row, isToday = row.date == today) }
             }
