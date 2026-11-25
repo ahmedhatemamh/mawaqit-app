@@ -1,5 +1,6 @@
 package work.ahmedhatem.mawaqit
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
@@ -42,6 +43,12 @@ class SearchTest {
         rule.onNodeWithTag("search_open").performClick()
     }
 
+    /** Like assertTextContains, but the failure message holds the text really shown (one line, so the CI log keeps it). */
+    private fun expectShown(tag: String, expected: String) {
+        val shown = rule.onNodeWithTag(tag).fetchSemanticsNode().config[SemanticsProperties.Text].joinToString(" ")
+        if (!shown.contains(expected)) throw AssertionError("$tag shows [$shown] but expected it to contain [$expected]")
+    }
+
     private fun fill(day: String, month: String, year: String) {
         if (day.isNotEmpty()) rule.onNodeWithTag("search_day").performTextInput(day)
         if (month.isNotEmpty()) rule.onNodeWithTag("search_month").performTextInput(month)
@@ -54,11 +61,11 @@ class SearchTest {
         fill("1", "3", "2025")
         rule.onNodeWithTag("search_go").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNodeWithTag("gregorian").assertTextContains(ArabicFormat.gregorian(LocalDate.of(2025, 3, 1)))
+        expectShown("gregorian", ArabicFormat.gregorian(LocalDate.of(2025, 3, 1)))
         rule.onNodeWithTag("back_to_today").performClick()
         rule.waitUntil(5_000) { rule.onAllNodes(hasTestTag("back_to_today")).fetchSemanticsNodes().isEmpty() }
         val today = EgyptClock.localDateTime(Instant.now()).toLocalDate()
-        rule.onNodeWithTag("gregorian").assertTextContains(ArabicFormat.gregorian(today))
+        expectShown("gregorian", ArabicFormat.gregorian(today))
     }
 
     @Test
